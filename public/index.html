@@ -37,7 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
 .hdr-left h1{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.4px;}
 .hdr-left .sub{font-size:11px;color:var(--text3);margin-top:1px;}
-.hdr-right{display:flex;align-items:center;gap:8px;flew-wrap:wrap;}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .btn{border:1px solid var(--border2);background:var(--bg3);color:var(--text2);padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
 .btn:hover{background:var(--accent)22;border-color:var(--accent)55;color:var(--accent2);}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
@@ -70,7 +70,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .fi-rank{position:absolute;top:8px;right:10px;font-size:11px;color:var(--text3);font-weight:700;}
 .fi-score{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px;}
 .fi-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fi-company{font-size:11px;color:var(--text4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-company{font-size:11px;color:var(--text4);white-space:nowrax;overflow:hidden;text-overflow:ellipsis;}
 .fi-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
 .followup-card{background:var(--bg2);border:1px solid var(--pink)44;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:none;}
 .followup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
@@ -316,7 +316,7 @@ textarea.form-input{resize:vertical;}
         <button class="fb" data-f="stage" data-v="Reached Out">Reached Out</button>
         <button class="fb" data-f="stage" data-v="Pending Reply">Pending</button>
         <button class="fb" data-f="stage" data-v="Proposal Sent">Proposal</button>
-        <button class="fb" data-f="stage" data-v="Won">Won</button>
+        <button class="fb" data-f="stage" data-v="Won'>Won</button>
         <button class="fb" data-f="stage" data-v="Dropped">Dropped</button>
       </div>
       <div class="search-wrap">
@@ -545,12 +545,12 @@ var SEED_DATA = [
   {name:'Asja Geppini',company:'Asja Geppini Studio',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Email',location:'Tuscany, Italy',priority:'Warm',interests:['Custom','3D Design','Remote','Samples'],event_name:'Texworld Paris 26',notes:'Remote 3D maker and designer. Strong conversion potential.'},
   {name:'Pazar Berlin',company:'Pazar Berlin',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Unknown',location:'Berlin, Germany',priority:'Warm',interests:['Custom','Streetwear','Blanks'],event_name:'Texworld Paris 26',notes:'K&K area 10119 Berlin.'},
   {name:'Crist Loyma',company:'Loyma',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Spain',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Loyma brand, Spain. Limited details.'},
-  {name:'Antoine Jacque',company:'Antoine Jacque',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Belgium',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Belgium (Brussels).��imited details.'},
+  {name:'Antoine Jacque',company:'Antoine Jacque',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Belgium',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Belgium (Brussels).jLimited details.'},
   {name:'Nikolaos Mitakidis',company:'Nikolaos Mitakidis',phone:'+30 6942 529449',email:'',type:'Brand',size:'Medium',preferred_contact:'Phone',location:'Patra, Greece',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Met a couple of times. Address: 26 Akti Dima str., Patra, Greece.'},
   {name:'Sovt',company:'Sovt Brand',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Unknown',priority:'Cold',interests:['Blanks','Custom'],event_name:'Texworld Paris 26',notes:'Brand contact. Limited details.'}
 ];
 
-// ── CONSTANTS & STATE ──────────────────────────────────────────────────
+// ── CONSTANTS & STATE ─────────────────────────────────────────
 var STAGES=['New','Reached Out','Pending Reply','Proposal Sent','In Discussion','Won','Dropped'];
 var STAGE_COLORS={'New':'#6f7280','Reached Out':'#60a5fa','Pending Reply':'#fbbf24','Proposal Sent':'#a89cff','In Discussion':'#fb923c','Won':'#4ade80','Dropped':'#f87171'};
 var STAGE_CSS={'New':'stage-new','Reached Out':'stage-reached','Pending Reply':'stage-pending','Proposal Sent':'stage-proposal','In Discussion':'stage-discussion','Won':'stage-won','Dropped':'stage-dropped'};
@@ -630,10 +630,10 @@ function switchEvent(ev){currentEvent=ev;renderEventBar();buildCharts();refresh(
 // ── KPIs ──────────────────────────────────────────────────────
 function updateKPIs(){
   var fc=filteredContacts(),total=fc.length,avg=total?Math.round(fc.reduce(function(a,c){return a+c.score;},0)/total):0;
-  document.getElementById('k'total').textContent=total;document.getElementById('k-avgscore').textContent=avg;
+  document.getElementById('k-total').textContent=total;document.getElementById('k-avgscore').textContent=avg;
   document.getElementById('k-entlarge').textContent=fc.filter(function(c){return c.size==='Enterprise'||c.size==='Large';}).length;
   document.getElementById('k-bigfish').textContent=fc.filter(function(c){return c.priority==='Big Fish';}).length;
-  document.getElementById('k+contacted').textContent=fc.filter(function(c){return c.stage&&c.stage!=='New';}).length;
+  document.getElementById('k-contacted').textContent=fc.filter(function(c){return c.stage&&c.stage!=='New';}).length;
   document.getElementById('k-remaining').textContent=fc.filter(function(c){return!c.stage||c.stage==='New';}).length;
   document.getElementById('k-pending').textContent=fc.filter(function(c){return c.stage==='Pending Reply';}).length;
   document.getElementById('k-won').textContent=fc.filter(function(c){return c.stage==='Won';}).length;
@@ -688,7 +688,7 @@ function getWAMsg(c){var fn=c.name.split(' ')[0];var int=(c.interests||[]).slice
 function openWhatsApp(){if(!currentEmailContact||!currentEmailContact.phone)return;window.open('https://wa.me/'+currentEmailContact.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(getWAMsg(currentEmailContact)),'_blank');}
 
 // ── NEXT STEPS ────────────────────────────────────────────────
-function getNextSteps(c){var st=c.stage||'New';var m={'New':['Send initial outreach referencing your meeting at '+(c.event||'the show'),'Connect on LinkedIn to warm up the relationship',c.preferredContact==='WhatsApp'?'Send a WhatsApp — this is their preferred channel':null,'Share the Threadlab lookbook / catalogue'],'Reached Out':['Follow up if no response in 3-5 days','Try a different channel: '+(c.phone?'Phone/WhatsApp at '+c.phone:'LinkedIn'),'Share a relevant case study or product image'],'Pending Reply':['They replied — respond within 24 hours','Address their questions','Propose a call to move forward faster'],'Proposal Sent':['Follow up if no response in 5-7 days','Offer to adjust pricing or MOQs','Suggest a call to walk through the proposal'],'In Discussion':['Confirm agreed next steps in writing','Prepare sample order or invoice','Check in every 3-4 days','Get a commitment on timeline and first order size'],'Won':['Send formal invoice and order confirmation','Introduce them to the Threadlab production team','Ask for a referral after delivery'],'Dropped':['Re-engage after 4-6 weeks with fresh context','Share something new (product launch, price update)','Keep on quarterly newsletter list']};return(m[st]||m['New']).filter(Boolean);}
+function getNextSteps(c){var st=c.stage||'New';var m={'New':['Send initial outreach referencing your meeting at '+(c.event||'the show'),'Connect on LinkedIn to warm up the relationship',c.preferredContact==='WhatsApp'?'Send a WhatsApp — this is their preferred channel':null,'Share the Threadlab lookbook / catalogue'],'Reached Out':['Follow up if no response in 3-5 days','Try a different channel: '+(c.phone?'phone/WhatsApp at '+c.phone:'LinkedIn'),'Share a relevant case study or product image'],'Pending Reply':['They replied — respond within 24 hours','Address their questions','Propose a call to move forward faster'],'Proposal Sent':['Follow up if no response in 5-7 days','Offer to adjust pricing or MOQs','Suggest a call to walk through the proposal'],'In Discussion':['Confirm agreed next steps in writing','Prepare sample order or invoice','Check in every 3-4 days','Get a commitment on timeline and first order size'],'Won':['Send formal invoice and order confirmation','Introduce them to the Threadlab production team','Ask for a referral after delivery'],'Dropped':['Re-engage after 4-6 weeks with fresh context','Share something new (product launch, price update)','Keep on quarterly newsletter list']};return(m[st]||m['New']).filter(Boolean);}
 
 // ── MODAL ─────────────────────────────────────────────────────
 function openModal(name){
