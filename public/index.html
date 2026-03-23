@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Threadlab — Expo Leads</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#0f0f13;--bg2:#1a1a2e;--bg3:#13131f;--border:#2a2a4a;--border2:#3a3a5a;
+  --text:#e8e8f0;--text2:#9a9aba;--text3:#5a5a7a;--text4:#7a7a9a;
+  --accent:#6c63ff;--accent2:#a89cff;
+  --green:#4ade80;--yellow:#fbbf24;--blue:#60a5fa;--orange:#fb923c;--pink:#f472b6;--red:#f87171;--teal:#34d399;--wa:#25d366;
+}
+.light {
+  --bg:#f0f0f7;--bg2:#ffffff;--bg3:#f7f7fc;--border:#d8d8e8;--border2:#c0c0d8;
+  --text:#1a1a2e;--text2:#4a4a6a;--text3:#8a8aaa;--text4:#6a6a8a;
+  --accent:#6c63ff;--accent2:#5a52ee;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px;width:360px;box-shadow:0 24px 64px #00000088;}
+.login-logo{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-.4px;}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:28px;}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.login-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:600;}
+.login-field input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;outline:none;font-family:inherit;}
+.login-field input:focus{border-color:var(--accent)88;}
+.login-btn{width:100%;background:var(--accent);border:none;color:#fff;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s;}
+.login-btn:hover{background:#7c73ff;}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;text-align:center;min-height:16px;}
+/* MAIN */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
+.hdr-left h1{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.4px;}
+.hdr-left .sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;flew-wrap:wrap;}
+.btn{border:1px solid var(--border2);background:var(--bg3);color:var(--text2);padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
+.btn:hover{background:var(--accent)22;border-color:var(--accent)55;color:var(--accent2);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-primary:hover{background:#7c73ff;color:#fff;}
+.btn-logout{border-color:#f8717155;color:var(--red);}
+.btn-logout:hover{background:#f8717122;border-color:var(--red);color:var(--red);}
+.event-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 28px;display:flex;align-items:center;gap:6px;overflow-x:auto;flex-wrap:nowrap;}
+.event-tab{border:1px solid var(--border2);background:var(--bg3);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.event-tab:hover{border-color:var(--accent)55;color:var(--accent2);}
+.event-tab.active{background:var(--accent)22;border-color:var(--accent);color:var(--accent2);}
+.event-tab.all-tab{background:var(--accent);border-color:var(--accent);color:#fff;}
+.event-tab.all-tab.active{background:var(--accent);color:#fff;}
+.container{max-width:1440px;margin:0 auto;padding:20px 28px;}
+.notice{background:var(--yellow)10;border:1px solid var(--yellow)33;border-radius:8px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;gap:16px;font-size:11px;color:var(--yellow);flex-wrap:wrap;}
+.notice b{font-weight:700;}
+.notice-sep{opacity:.4;}
+.kpi-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:18px;}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:border-color .2s,transform .15s;}
+.kpi:hover{border-color:var(--accent)55;transform:translateY(-1px);}
+.kpi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--text4);margin-bottom:5px;}
+.kpi-val{font-size:26px;font-weight:700;line-height:1;}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:18px;}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);}
+.section-sub{font-size:11px;color:var(--text3);}
+.focus-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.focus-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.focus-item:hover{border-color:var(--accent)55;background:var(--bg2);}
+.fi-rank{position:absolute;top:8px;right:10px;font-size:11px;color:var(--text3);font-weight:700;}
+.fi-score{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px;}
+.fi-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-company{font-size:11px;color:var(--text4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.followup-card{background:var(--bg2);border:1px solid var(--pink)44;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:none;}
+.followup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.fu-item{background:var(--bg3);border:1px solid var(--pink)33;border-radius:8px;padding:12px;cursor:pointer;transition:border-color .15s;}
+.fu-item.urgent{border-color:var(--red);}
+.fu-item:hover{background:var(--bg2);}
+.fu-name{font-size:12px;font-weight:700;color:var(--text);}
+.fu-company{font-size:11px;color:var(--text4);margin-bottom:4px;}
+.fu-days{font-size:11px;color:var(--pink);font-weight:600;}
+.pipe-stages{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:12px;}
+.pipe-stage{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 10px;text-align:center;cursor:pointer;transition:border-color .2s,background .15s;}
+.pipe-stage:hover,.pipe-stage.active{border-color:var(--accent);background:var(--bg2);}
+.pipe-stage.active{background:var(--accent)15;}
+.ps-label{font-size:10px;color:var(--text2);margin-bottom:6px;}
+.ps-count{font-size:24px;font-weight:700;color:var(--text);}
+.ps-bar{height:3px;border-radius:2px;margin-top:8px;}
+.charts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.chart-box h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text2);margin-bottom:12px;}
+.chart-wrap{position:relative;height:180px;}
+.email-hub-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:12px;}
+.email-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:border-color .15s;}
+.email-card:hover{border-color:var(--accent)55;background:var(--bg2);}
+.ec-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ec-company{font-size:11px;color:var(--text4);margin-bottom:6px;}
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.filter-group{font-size:10px;color:var(--text4);font-weight:600;text-transform:uppercase;}
+.filter-btns{display:flex;gap:4px;flex-wrap:wrap;}
+.fb{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;transition:all .1s;font-weight:500;}
+.fb:hover,.fb.on{background:var(--accent)22;border-color:var(--accent)55;color:var(--accent2);}
+.search-wrap{position:relative;margin-left:auto;}
+.search-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px 6px 28px;border-radius:7px;font-size:12px;width:220px;outline:none;}
+.search-input:focus{border-color:var(--accent)55;}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);}
+.contacts-table{width:100%;border-collapse:collapse;font-size:12px;}
+.contacts-table th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;}
+.contacts-table th:hover{color:var(--text2);}
+.contacts-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.contacts-table tr:hover td{background:var(--bg3);cursor:pointer;}
+.score-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-size:11px;color:#fff;}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;}
+.prio-bigfish{background:#f8717133;color:var(--red);}
+.prio-hot{background:#fb923c33;color:var(--orange);}
+.prio-warm{background:#60a5fa33;color:var(--blue);}
+.prio-cold{background:#6b728033;color:#9ca3af;}
+.size-ent{background:#a89cff33;color:var(--accent2);}
+.size-large{background:#34d39933;color:var(--teal);}
+.size-medium{background:#60a5fa33;color:var(--blue);}
+.size-small{background:#fbbf2433;color:var(--yellow);}
+.size-startup{background:#f472b633;color:var(--pink);}
+.stage-new{background:#3a3a5a33;color:var(--text2);}
+.stage-reached{background:#60a5fa33;color:var(--blue);}
+.stage-pending{background:#fbbf2433;color:var(--yellow);}
+.stage-proposal{background:#a89cff33;color:var(--accent2);}
+.stage-discussion{background:#fb923c33;color:var(--orange);}
+.stage-won{background:#4ade8033;color:var(--green);}
+.stage-dropped{background:#f8717133;color:var(--red);}
+.tag-interest{background:var(--bg3);border:1px solid var(--border);color:var(--accent2);padding:2px 8px;border-radius:4px;font-size:10px;display:inline-block;margin:2px;}
+.event-badge{background:var(--accent)22;border:1px solid var(--accent)55;color:var(--accent2);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;}
+.wa-badge{display:inline-block;background:#25d36622;border:1px solid #25d36655;color:var(--wa);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px;}
+.modal-backdrop{position:fixed;inset:0;background:#00000088;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:700px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 64px #00000088;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text4);font-size:18px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+.modal-close:hover{background:var(--border);color:var(--text);}
+.modal-head{padding:20px 24px 0;}
+.modal-score-wrap{position:absolute;top:16px;right:48px;text-align:right;}
+.modal-score-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;}
+.modal-score{font-size:40px;font-weight:700;line-height:1;}
+.modal-name{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;padding-right:110px;}
+.modal-company{font-size:14px;color:var(--text4);margin-bottom:10px;}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.modal-body{padding:0 24px 24px;}
+.modal-section{margin-top:16px;}
+.modal-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px;}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.info-item label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);display:block;margin-bottom:3px;}
+.info-item .val{font-size:13px;color:var(--text);}
+.info-item a{color:var(--blue);text-decoration:none;}
+.copy-btn{background:var(--border);border:none;color:var(--text2);padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;margin-left:6px;}
+.copy-btn:hover{background:var(--border2);color:var(--text);}
+.stage-select,.form-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:7px;font-size:12px;outline:none;font-family:inherit;}
+.stage-select{width:100%;cursor:pointer;}
+.stage-select:focus,.form-input:focus{border-color:var(--accent)55;}
+.notes-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.6;}
+.personal-notes{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;color:var(--text);line-height:1.6;width:100%;resize:vertical;min-height:80px;outline:none;font-family:inherit;}
+.personal-notes:focus{border-color:var(--accent)55;}
+.save-note-btn{margin-top:6px;background:var(--accent);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.save-note-btn:hover{background:#7c73ff;}
+.interests-wrap{display:flex;gap:4px;flex-wrap:wrap;}
+.email-template-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:8px;}
+.email-tab-bar{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.email-tab{background:var(--border);border:1px solid var(--border2);color:var(--text2);padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:500;}
+.email-tab.active{background:var(--accent)22;border-color:var(--accent)55;color:var(--accent2);}
+.email-subject{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);width:100%;margin-bottom:8px;font-family:inherit;}
+.email-body{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;color:var(--text2);width:100%;min-height:140px;resize:vertical;line-height:1.6;font-family:inherit;}
+.email-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.btn-send{background:#4ade8022;border:1px solid #4ade8055;color:var(--green);padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.btn-copy-email{background:var(--accent)22;border:1px solid var(--accent)55;color:var(--accent2);padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.btn-whatsapp{background:#25d36622;border:1px solid #25d36655;color:var(--wa);padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;display:none;}
+.next-steps-box{background:var(--yellow)08;border:1px solid var(--yellow)30;border-radius:8px;padding:12px;margin-top:8px;}
+.next-steps-box ul{padding-left:16px;margin-top:4px;}
+.next-steps-box li{font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.5;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.modal-actions{display:flex;gap:8px;margin-top:4px;}
+.btn-edit{background:var(--yellow)22;border:1px solid var(--yellow)55;color:var(--yellow);padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.btn-edit:hover{background:var(--yellow)33;}
+.form-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:560px;max-height:92vh;overflow-y:auto;position:relative;padding:24px;box-shadow:0 24px 64px #00000088;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text4);font-weight:600;}
+.form-group.full{grid-column:1/-1;}
+.form-input{width:100%;}
+textarea.form-input{resize:vertical;}
+.event-input-wrap{position:relative;}
+.event-suggestions{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;z-index:200;margin-top:2px;overflow:hidden;display:none;}
+.event-suggestion{padding:8px 12px;font-size:12px;cursor:pointer;color:var(--text);}
+.event-suggestion:hover{background:var(--accent)22;color:var(--accent2);}
+.empty-state{text-align:center;padding:40px;color:var(--text3);}
+.empty-state .es-icon{font-size:32px;margin-bottom:8px;}
+.empty-state p{font-size:13px;}
+.theme-btn{font-size:16px;padding:6px 10px;}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.charts-grid{grid-template-columns:repeat(2,1fr);}.focus-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.pipe-stages{grid-template-columns:repeat(4,1fr);}.charts-grid{grid-template-columns:1fr;}.focus-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Threadlab</div>
+    <div class="login-sub">Expo Lead Tracker — sign in to continue</div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="daniel@threadlab.com.au" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
+<header>
+  <div class="hdr-left">
+    <h1>Threadlab — Expo Leads</h1>
+    <div class="sub" id="hdr-sub">Loading...</div>
+  </div>
+  <div class="hdr-right">
+    <button class="btn theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Lead</button>
+    <button class="btn" onclick="exportCSV()">↓ Export CSV</button>
+    <button class="btn btn-logout" onclick="doLogout()">Sign Out</button>
+  </div>
+</header>
+<div class="event-bar" id="event-bar"></div>
+<div class="container">
+  <div class="notice">
+    <span>🗄️ <b>Supabase backend active</b> — all data stored in Postgres, persists across sessions.</span>
+    <span class="notice-sep">|</span>
+    <span id="storage-status">Loading...</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-lbl">Total Leads</div><div class="kpi-val" style="color:var(--accent2)" id="k-total">—</div><div class="kpi-sub">In view</div></div>
+    <div class="kpi"><div class="kpi-lbl">Avg Score</div><div class="kpi-val" style="color:var(--yellow)" id="k-avgscore">—</div><div class="kpi-sub">Out of 100</div></div>
+    <div class="kpi"><div class="kpi-lbl">💰 Ent./Large</div><div class="kpi-val" style="color:var(--blue)" id="k-entlarge">—</div><div class="kpi-sub">High-volume</div></div>
+    <div class="kpi"><div class="kpi-lbl">🐟 Big Fish</div><div class="kpi-val" style="color:var(--orange)" id="k-bigfish">—</div><div class="kpi-sub">Top prospects</div></div>
+    <div class="kpi"><div class="kpi-lbl">✅ Contacted</div><div class="kpi-val" style="color:var(--green)" id="k-contacted">—</div><div class="kpi-sub">Reached out</div></div>
+    <div class="kpi"><div class="kpi-lbl">✖ Remaining</div><div class="kpi-val" style="color:var(--pink)" id="k-remaining">—</div><div class="kpi-sub">Not contacted</div></div>
+    <div class="kpi"><div class="kpi-lbl">🔔 Pending</div><div class="kpi-val" style="color:var(--yellow)" id="k-pending">—</div><div class="kpi-sub">Awaiting reply</div></div>
+    <div class="kpi"><div class="kpi-lbl">🏆 Won</div><div class="kpi-val" style="color:var(--green)" id="k-won">—</div><div class="kpi-sub">Converted</div></div>
+  </div>
+  <div class="card">
+    <div class="section-hdr">
+      <span class="section-title">🎯 Today's Focus — Top 5 Uncontacted</span>
+      <span class="section-sub" id="focus-sub"></span>
+    </div>
+    <div class="focus-grid" id="focus-grid"><div class="empty-state" style="grid-column:1/-1"><p>Loading...</p></div></div>
+  </div>
+  <div class="followup-card" id="followup-card">
+    <div class="section-hdr">
+      <span class="section-title">🔔 Follow-Up Needed <span id="fu-badge" style="background:var(--pink)22;border:1px solid var(--pink)55;color:var(--pink);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;margin-left:6px;"></span></span>
+      <span class="section-sub" id="fu-sub"></span>
+    </div>
+    <div class="followup-grid" id="followup-grid"></div>
+  </div>
+  <div class="card">
+    <div class="section-hdr">
+      <span class="section-title">Pipeline Overview</span>
+      <span class="section-sub">Click a stage to filter</span>
+    </div>
+    <div class="pipe-stages" id="pipe-stages"></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-box"><h3>Customer Size</h3><div class="chart-wrap"><canvas id="chartSize"></canvas></div></div>
+    <div class="chart-box"><h3>Lead Priority</h3><div class="chart-wrap"><canvas id="chartPrio"></canvas></div></div>
+    <div class="chart-box"><h3>Preferred Contact</h3><div class="chart-wrap"><canvas id="chartContact"></canvas></div></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-box"><h3>Product Interest</h3><div class="chart-wrap"><canvas id="chartInterests"></canvas></div></div>
+    <div class="chart-box"><h3>Geographic Distribution</h3><div class="chart-wrap"><canvas id="chartGeo"></canvas></div></div>
+    <div class="chart-box"><h3>Size × Priority</h3><div class="chart-wrap"><canvas id="chartMatrix"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="section-hdr">
+      <span class="section-title">📧 Email Outreach Hub</span>
+      <span class="section-sub">Click a lead to open their draft</span>
+    </div>
+    <div class="email-hub-inner" id="email-hub-grid"></div>
+  </div>
+  <div class="card">
+    <div class="section-hdr" style="margin-bottom:10px;">
+      <span class="section-title">All Contacts</span>
+      <span class="section-sub" id="table-count"></span>
+    </div>
+    <div class="filters">
+      <span class="filter-group">Priority:</span>
+      <div class="filter-btns">
+        <button class="fb on" data-f="priority" data-v="All">All</button>
+        <button class="fb" data-f="priority" data-v="Big Fish">🐟 Big Fish</button>
+        <button class="fb" data-f="priority" data-v="Hot">🔥 Hot</button>
+        <button class="fb" data-f="priority" data-v="Warm">🌤 Warm</button>
+        <button class="fb" data-f="priority" data-v="Cold">❄ Cold</button>
+      </div>
+      <span class="filter-group">Size:</span>
+      <div class="filter-btns">
+        <button class="fb on" data-f="size" data-v="All">All</button>
+        <button class="fb" data-f="size" data-v="Enterprise">Ent.</button>
+        <button class="fb" data-f="size" data-v="Large">Large</button>
+        <button class="fb" data-f="size" data-v="Medium">Med.</button>
+        <button class="fb" data-f="size" data-v="Small">Small</button>
+        <button class="fb" data-f="size" data-v="Startup">Startup</button>
+      </div>
+      <span class="filter-group">Stage:</span>
+      <div class="filter-btns">
+        <button class="fb on" data-f="stage" data-v="All">All</button>
+        <button class="fb" data-f="stage" data-v="New">New</button>
+        <button class="fb" data-f="stage" data-v="Reached Out">Reached Out</button>
+        <button class="fb" data-f="stage" data-v="Pending Reply">Pending</button>
+        <button class="fb" data-f="stage" data-v="Proposal Sent">Proposal</button>
+        <button class="fb" data-f="stage" data-v="Won">Won</button>
+        <button class="fb" data-f="stage" data-v="Dropped">Dropped</button>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search-input" placeholder="Search name, company, interest..." oninput="applyFilters()">
+      </div>
+    </div>
+    <table class="contacts-table">
+      <thead><tr>
+        <th onclick="sortBy('name')">Name ↕</th>
+        <th onclick="sortBy('company')">Company ↕</th>
+        <th>Contact</th><th>Event</th>
+        <th onclick="sortBy('size')">Size ↕</th>
+        <th onclick="sortBy('score')">Score ↕</th>
+        <th onclick="sortBy('priority')">Priority ↕</th>
+        <th>Stage</th><th>Notes</th>
+      </tr></thead>
+      <tbody id="contacts-tbody"><tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LEAD DETAIL MODAL -->
+<div class="modal-backdrop" id="lead-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-score-wrap"><div class="modal-score-lbl">Score</div><div class="modal-score" id="m-score"></div></div>
+    <div class="modal-head">
+      <div class="modal-name" id="m-name"></div>
+      <div class="modal-company" id="m-company"></div>
+      <div class="modal-tags" id="m-tags"></div>
+    </div>
+    <div class="modal-body">
+      <div class="divider"></div>
+      <div class="modal-actions"><button class="btn-edit" onclick="openEditModal()">✏️ Edit Lead</button></div>
+      <div class="info-row" style="margin-top:12px;">
+        <div class="info-item"><label>Contact Info</label><div class="val" id="m-contact"></div></div>
+        <div class="info-item"><label>Location</label><div class="val" id="m-location"></div></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Pipeline Stage</div>
+        <select class="stage-select" id="m-stage-select" onchange="saveStage()">
+          <option value="New">📄 New</option>
+          <option value="Reached Out">👈 Reached Out</option>
+          <option value="Pending Reply">🔔 Pending Reply</option>
+          <option value="Proposal Sent">📋 Proposal Sent</option>
+          <option value="In Discussion">💬 In Discussion</option>
+          <option value="Won">✅ Won</option>
+          <option value="Dropped">❌ Dropped</option>
+        </select>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Interests &amp; Products</div>
+        <div class="interests-wrap" id="m-interests"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Notes from Show</div>
+        <div class="notes-box" id="m-notes"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Your Personal Notes <span style="color:var(--text3);font-size:9px;text-transform:none;">(saved to Supabase)</span></div>
+        <textarea class="personal-notes" id="m-personal-notes" placeholder="Add follow-up notes, action items..."></textarea>
+        <button class="save-note-btn" onclick="savePersonalNote()">Save Note</button>
+      </div>
+      <div class="divider"></div>
+      <div class="modal-section">
+        <div class="modal-section-title" style="color:var(--green)">📧 Email Outreach — Dynamic Templates</div>
+        <div class="email-template-wrap">
+          <div class="email-tab-bar" id="email-tab-bar"></div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px;">Subject</div>
+          <input class="email-subject" id="email-subject" type="text">
+          <div style="font-size:10px;color:var(--text3);margin:8px 0 3px;">Body</div>
+          <textarea class="email-body" id="email-body"></textarea>
+          <div class="email-actions">
+            <button class="btn-send" onclick="openInEmailClient()">📧 Open in Email Client</button>
+            <button class="btn-copy-email" onclick="copyEmailToClipboard()">📋 Copy Email</button>
+            <button class="btn-whatsapp" id="btn-whatsapp" onclick="openWhatsApp()">📱 WhatsApp</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">💡 Suggested Next Steps</div>
+        <div class="next-steps-box" id="m-next-steps"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-backdrop" id="form-modal">
+  <div class="form-modal">
+    <button class="modal-close" onclick="closeFormModal()">✕</button>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px;" id="form-modal-title">+ Add New Lead</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Name *</label><input class="form-input" id="f-name" placeholder="Full name"></div>
+      <div class="form-group"><label>Company *</label><input class="form-input" id="f-company" placeholder="Company name"></div>
+      <div class="form-group"><label>Email</label><input class="form-input" id="f-email" placeholder="email@example.com"></div>
+      <div class="form-group"><label>Phone / WhatsApp</label><input class="form-input" id="f-phone" placeholder="+1 234 567 890"></div>
+      <div class="form-group"><label>Type</label><select class="form-input" id="f-type"><option>Brand</option><option>Retail</option><option>Manufacturing</option><option>Print</option><option>Other</option></select></div>
+      <div class="form-group"><label>Size</label><select class="form-input" id="f-size"><option>Enterprise</option><option>Large</option><option>Medium</option><option>Small</option><option>Startup</option></select></div>
+      <div class="form-group"><label>Priority</label><select class="form-input" id="f-priority"><option>Big Fish</option><option>Hot</option><option>Warm</option><option>Cold</option></select></div>
+      <div class="form-group"><label>Preferred Contact</label><select class="form-input" id="f-contact"><option>Email</option><option>Phone</option><option>WhatsApp</option><option>Unknown</option></select></div>
+      <div class="form-group"><label>Location</label><input class="form-input" id="f-location" placeholder="City, Country"></div>
+      <div class="form-group"><label>Event / Expo</label>
+        <div class="event-input-wrap">
+          <input class="form-input" id="f-event" placeholder="e.g. Texworld Paris 26" autocomplete="off" oninput="showEventSuggestions()" onfocus="showEventSuggestions()">
+          <div class="event-suggestions" id="event-suggestions"></div>
+        </div>
+      </div>
+      <div class="form-group full"><label>Interests (comma separated)</label><input class="form-input" id="f-interests" placeholder="Custom, Blanks, Volume"></div>
+      <div class="form-group full"><label>Notes</label><textarea class="form-input" id="f-notes" rows="3" placeholder="Notes from the show..."></textarea></div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="saveFormLead()" style="flex:1;" id="form-save-btn">Save Lead</button>
+      <button class="btn" onclick="closeFormModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+</div><!-- end #main-app -->
+
+<script>
+// ── SUPABASE ──────────────────────────────────────────────────
+var SUPABASE_URL = 'https://jmplldpbabownxecoaaq.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptcGxsZHBiYWJvd254ZWNvYWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODgzMTcsImV4cCI6MjA4OTc2NDMxN30.Kr4QRP048u_y-CF_0b9zDDD86QuR3mWBjj1WnfZOflw';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value;
+  var errEl = document.getElementById('login-error');
+  var btn = document.getElementById('login-btn');
+  errEl.textContent = '';
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+  var r = await sb.auth.signInWithPassword({ email: email, password: password });
+  if (r.error) {
+    errEl.textContent = r.error.message;
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+  } else {
+    showApp();
+    loadFromStorage();
+  }
+}
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-btn').textContent = 'Sign In';
+  document.getElementById('login-btn').disabled = false;
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  applyTheme(localStorage.getItem('tl-theme') === 'light');
+}
+document.getElementById('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
+// ── ROW MAPPING ───────────────────────────────────────────────
+function mapRow(row) {
+  return {
+    id: row.id, name: row.name, company: row.company,
+    email: row.email || '', phone: row.phone || '',
+    type: row.type || 'Brand', size: row.size || 'Medium', priority: row.priority || 'Warm',
+    preferredContact: row.preferred_contact || 'Email',
+    location: row.location || '', event: row.event_name || '',
+    interests: row.interests || [], notes: row.notes || '',
+    score: row.score || 0, stage: row.stage || 'New',
+    pendingSince: row.pending_since || null, personalNote: row.personal_note || ''
+  };
+}
+function toDbRow(obj) {
+  return {
+    name: obj.name, company: obj.company, email: obj.email || '', phone: obj.phone || '',
+    type: obj.type || 'Brand', size: obj.size || 'Medium', priority: obj.priority || 'Warm',
+    preferred_contact: obj.preferredContact || 'Email', location: obj.location || '',
+    event_name: obj.event || '', interests: obj.interests || [],
+    notes: obj.notes || '', score: obj.score || 0
+  };
+}
+
+// ── SEED DATA ─────────────────────────────────────────────────
+var SEED_DATA = [
+  {name:'Jeremy Desnoulez',company:'DTO Fashion',phone:'+33 6 20 56 15 74',email:'',type:'Brand',size:'Enterprise',preferred_contact:'Email',location:'France',priority:'Big Fish',interests:['Agent','Premium Brands','Custom','Blanks'],event_name:'Texworld Paris 26',notes:'BIG FISH. Agent for premium French/EU brands — manages large client base. Wants to explore if Threadlab can supply at scale.'},
+  {name:'Henri Abitan',company:'Modextil Inc.',phone:'(514) 574-5555 / +1 438-926-8679',email:'',type:'Manufacturing',size:'Enterprise',preferred_contact:'Phone',location:'Montreal, Canada / New York, USA',priority:'Big Fish',interests:['Fabric','Volume','Agent','Blanks','Manufacturing'],event_name:'Texworld Paris 26',notes:'BIG FISH — Monster whale doing $50m+. Sells fabric in Colombia and manages manufacturers. Address: 45525 Pare St, Montreal QC / 80 W 40th St Suite 25, NY 10018.'},
+  {name:'Nassif Kamle',company:'Columbia Fabric Supplier',phone:'',email:'',type:'Manufacturing',size:'Enterprise',preferred_contact:'WhatsApp',location:'Bogota, Colombia',priority:'Big Fish',interests:['Blanks','Volume','Agent','Fabric','Manufacturing'],event_name:'Texworld Paris 26',notes:'BIG FISH. Selling fabric in Colombia, doing $50m+. Address: Cra. 14# 79-17, Bogota.'},
+  {name:'Jenny Mueller',company:'Rate Bank',phone:'',email:'jenny@rate.com',type:'Retail',size:'Enterprise',preferred_contact:'Email',location:'Chicago, USA',priority:'Hot',interests:['Custom','Blanks','Investment','Retail'],event_name:'Texworld Paris 26',stage:'Reached Out',notes:'Cashed-up investors extending a clothing company they bought equity into. Communicate via WeChat and email. Additional contact: Carolina Capilla.'},
+  {name:'Marc Ochsner',company:'OchsHSport AG',phone:'',email:'info@salesochsnersport.ag',type:'Retail',size:'Enterprise',preferred_contact:'Email',location:'Switzerland',priority:'Hot',interests:['Premium Tees','Blanks','Retail','Core Range'],event_name:'Texworld Paris 26',notes:'Retail chain with 100+ stores in Holland, Belgium and Germany. Interested in premium and elevated product.'},
+  {name:'Kiyan',company:'Vicinity',phone:'',email:'',type:'Retail',size:'Large',preferred_contact:'WhatsApp',location:'Australia',priority:'Hot',interests:['Blanks','Retail','Core Range','Volume'],event_name:'Texworld Paris 26',notes:'Australian retail group. Interested in core blanks at volume.'},
+  {name:'Wam Denim',company:'Wam Denim',phone:'',email:'',type:'Brand',size:'Large',preferred_contact:'WhatsApp',location:'France',priority:'Hot',interests:['Denim','Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Denim-focused brand. Holland, Belgium, Germany footprint. Website: wamdenim.com.'},
+  {name:'Dose Munoz',company:'Undergold Apparel',phone:'',email:'dose.munoz@undergoldapparel.com',type:'Manufacturing',size:'Large',preferred_contact:'Email',location:'Colombia',priority:'Hot',interests:['Garment Dyeing','Custom','Distress','Manufacturing'],event_name:'Texworld Paris 26',notes:'Specialist in distress and garment dye. Exploring Threadlab as supplier partner.'},
+  {name:'Renaud Bizeul',company:'Thomswa Koncept / Oxyaali',phone:'+244 936 864 189',email:'',type:'Manufacturing',size:'Large',preferred_contact:'Phone',location:'Angola',priority:'Hot',interests:['Manufacturing','Custom','Volume','End-to-End'],event_name:'Texworld Paris 26',notes:'Head of Operations. End-to-finish manufacturing. Angola-based.'},
+  {name:'Ruthless Rednecks',company:'Ruthless Rednecks',phone:'',email:'info@ruthlessrednecks.com',type:'Brand',size:'Medium',preferred_contact:'Email',location:'Canada',priority:'Hot',interests:['Blanks','Screen Print','DTG','Hoodies'],event_name:'Texworld Paris 26',notes:'Canadian brand. Core tee $3.80 + ~$2 screen print. 200-piece orders, 2-week turnaround.'},
+  {name:'Tan Roujou',company:'Tan Roujou',phone:'',email:'tan.roujou@laposte.net',type:'Brand',size:'Small',preferred_contact:'Email',location:'Cyprus',priority:'Hot',interests:['Custom','Blanks','Order'],event_name:'Texworld Paris 26',stage:'Reached Out',notes:'Has placed an order. Follow up to confirm delivery status.'},
+  {name:'Jay',company:'Maceoo',phone:'',email:'jay@maceoo.com',type:'Brand',size:'Startup',preferred_contact:'Email',location:'France',priority:'Warm',interests:['Premium Tees','Stripe','Polo','250GSM'],event_name:'Texworld Paris 26',notes:'French startup. Stripe/polo styles at 250GSM. Send lookbook + pricing.'},
+  {name:'Eloi',company:'Hoseki Gear',phone:'',email:'',type:'Brand',size:'Startup',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Blanks','Custom'],event_name:'Texworld Paris 26',notes:'Startup brand. Exploring custom blanks.'},
+  {name:'Yasmin',company:'PurpleWear',phone:'',email:'pact@purplewear.store',type:'Brand',size:'Medium',preferred_contact:'Email',location:'Spain',priority:'Warm',interests:['Custom','Modular','Back Print','Sleeves'],event_name:'Texworld Paris 26',notes:'Interested in modular designs — back and sleeve detailing.'},
+  {name:'Kenny',company:'X4ice',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Blanks','Custom'],event_name:'Texworld Paris 26',notes:'~7 euros per piece. Follow up with pricing sheet.'},
+  {name:'Archie',company:'Tour Merch Co.',phone:'',email:'',type:'Print',size:'Medium',preferred_contact:'Unknown',location:'Unknown',priority:'Warm',interests:['Tour Merch','DTG','Custom','Screen Print'],event_name:'Texworld Paris 26',notes:'Tour merchandise specialist. Volume print runs.'},
+  {name:'Paul Fitzpatrick',company:'@dallende',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Unknown',location:'Australia',priority:'Warm',interests:['Custom','Hotels','Lifestyle','Uniforms'],event_name:'Texworld Paris 26',notes:'Sydney-based. Hotels and hospitality. Explore uniform and lifestyle apparel.'},
+  {name:'Marco Fu',company:'Marco Fu Studio',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Email',location:'Italy',priority:'Warm',interests:['Custom','Premium Tees','Samples'],event_name:'Texworld Paris 26',notes:'Has bought custom at ~3 USD. Interested in elevated T-shirt range ~10 AUD wholesale.'},
+  {name:'Cecilia',company:'Independent Brand',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Unknown',location:'Unknown',priority:'Warm',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Build relationship and send catalogue.'},
+  {name:'Robert Armenia',company:'Robert Armenia',phone:'+380978751388',email:'',type:'Brand',size:'Medium',preferred_contact:'Phone',location:'Armenia',priority:'Warm',interests:['Custom','MMA','Sportswear'],event_name:'Texworld Paris 26',notes:'MMA/athletic apparel. Contact at 22 AUD price point.'},
+  {name:'Reza & Patrick',company:'Reza & Patrick',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Custom','Blanks','Polo'],event_name:'Texworld Paris 26',notes:'Two-person team. Custom blanks, wholesale pricing, polo range.'},
+  {name:'Rocha',company:'Rocha Brand',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Portugal',priority:'Cold',interests:['Custom'],event_name:'Texworld Paris 26',notes:'Portuguese brand. Limited details.'},
+  {name:'Franck Tack',company:'Franck Tack Studio',phone:'',email:'',type:'Manufacturing',size:'Medium',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Manufacturing','Custom','Blanks'],event_name:'Texworld Paris 26',notes:'French manufacturing contact.'},
+  {name:'Mario',company:'Rookie Ball',phone:'',email:'',type:'Brand',size:'Startup',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Basketball','Lifestyle','Blanks'],event_name:'Texworld Paris 26',notes:'Basketball lifestyle brand — Rookie Ball.'},
+  {name:'ShyV Paris',company:'ShyV Paris',phone:'+33 4 86 17 74 80',email:'info@shyv.paris',type:'Brand',size:'Medium',preferred_contact:'Email',location:'France',priority:'Warm',interests:['Premium Tees','Custom','Streetwear'],event_name:'Texworld Paris 26',notes:'Paris streetwear/premium brand. Michel Setbo, Sandra, Alex. Based in Vitrolles.'},
+  {name:'Matteo',company:'Mataruck',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Spain',priority:'Warm',interests:['Custom','Catalogue','Blanks'],event_name:'Texworld Paris 26',notes:'Spain-based. Launching catalogue. Not yet fully launched.'},
+  {name:'Julian',company:'ao02fly',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Unknown',location:'Unknown',priority:'Warm',interests:['Blanks','Screen Print','Volume'],event_name:'Texworld Paris 26',notes:'300-500 pieces per design, ~5x/month. ~6 USD / ~10 AUD elevated.'},
+  {name:'Ailin Rogaczewski',company:'Kosiuko',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Email',location:'Buenos Aires, Argentina',priority:'Warm',interests:['Custom','Blanks','Wholesale'],event_name:'Texworld Paris 26',notes:'~22 EUR price point. Address: Cuyo 1722, 1640.'},
+  {name:'Henny',company:'ICE',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Blanks','Custom','Streetwear'],event_name:'Texworld Paris 26',notes:'ICE brand. Exploring Threadlab blanks and custom range.'},
+  {name:'Jan Schmalstieg',company:'Bad Portier',phone:'',email:'js@badportier.com',type:'Brand',size:'Small',preferred_contact:'Email',location:'Germany',priority:'Warm',interests:['Custom','Supply Chain','Labels','QR Codes'],event_name:'Texworld Paris 26',notes:'Supply chain discussion. QR code integration for labelling.'},
+  {name:'Rogier van Vliet',company:'Roch',phone:'+31 6 14661157',email:'studio@rochlabel.nl',type:'Brand',size:'Small',preferred_contact:'Phone',location:'Netherlands',priority:'Warm',interests:['Custom','Premium Tees','Labels','Woven'],event_name:'Texworld Paris 26',notes:'Dutch brand Roch. Custom label and elevated range. AU diamond price point.'},
+  {name:'Pal Mutandwa',company:'Button Bros',phone:'+27 83 861 9935',email:'',type:'Brand',size:'Medium',preferred_contact:'Phone',location:'South Africa',priority:'Warm',interests:['Custom','MMA','Sportswear','Blanks'],event_name:'Texworld Paris 26',notes:'CEO & Founder. MMA apparel. Met in Paris at 61 Rue de Lyon, 75012.'},
+  {name:'Mari',company:'Gaudi Trade',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Italy',priority:'Warm',interests:['Custom','Ecommerce','Blanks'],event_name:'Texworld Paris 26',notes:'Gaudi Trade, Italy. Ecommerce focus.'},
+  {name:'Hoax Basics',company:'Hoax Basics',phone:'',email:'',type:'Print',size:'Startup',preferred_contact:'Unknown',location:'Unknown',priority:'Warm',interests:['Decorator','Merch','Screen Print','DTG'],event_name:'Texworld Paris 26',notes:'Decorator. Merch space. @hoax1994.'},
+  {name:'Radoslav Gaydarov',company:'Bogara Ltd / Pause Jeans',phone:'',email:'',type:'Manufacturing',size:'Medium',preferred_contact:'Unknown',location:'Bulgaria',priority:'Warm',interests:['Manufacturing','FOB','Denim','Custom'],event_name:'Texworld Paris 26',notes:'FOB purchasing. Explore Threadlab as supplier.'},
+  {name:'Sofia',company:'Twentyfourseven Srl',phone:'',email:'sofia@247.it',type:'Brand',size:'Small',preferred_contact:'Email',location:'Italy',priority:'Warm',interests:['Wholesale','Custom','Premium Tees','Design'],event_name:'Texworld Paris 26',notes:'Jr Product Development. Wholesale at ~4 USD. Strong interest.'},
+  {name:'Rousseau Jayson',company:'RDSN',phone:'',email:'',type:'Brand',size:'Startup',preferred_contact:'Unknown',location:'France',priority:'Warm',interests:['Custom','Blanks','Order'],event_name:'Texworld Paris 26',notes:'RDSN brand. Rdsn.shop. Big order potential.'},
+  {name:'Luigi Sasan',company:'Luigi Sasan',phone:'',email:'luigi.sasan@virgilio.it',type:'Brand',size:'Small',preferred_contact:'Email',location:'Italy',priority:'Warm',interests:['Custom','Joggers','Blanks'],event_name:'Texworld Paris 26',notes:'Italy. Interested in joggers and custom range.'},
+  {name:'Mehdi Raad',company:'MAC ZOO / Maceoo',phone:'+1 (702) 342-4475',email:'m@maczoo.com',type:'Brand',size:'Medium',preferred_contact:'Phone',location:'Las Vegas, USA',priority:'Warm',interests:['Premium Tees','Custom','Streetwear','250GSM'],event_name:'Texworld Paris 26',notes:'Las Vegas. Follow up on elevated tee range.'},
+  {name:'Asja Geppini',company:'Asja Geppini Studio',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Email',location:'Tuscany, Italy',priority:'Warm',interests:['Custom','3D Design','Remote','Samples'],event_name:'Texworld Paris 26',notes:'Remote 3D maker and designer. Strong conversion potential.'},
+  {name:'Pazar Berlin',company:'Pazar Berlin',phone:'',email:'',type:'Brand',size:'Medium',preferred_contact:'Unknown',location:'Berlin, Germany',priority:'Warm',interests:['Custom','Streetwear','Blanks'],event_name:'Texworld Paris 26',notes:'K&K area 10119 Berlin.'},
+  {name:'Crist Loyma',company:'Loyma',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Spain',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Loyma brand, Spain. Limited details.'},
+  {name:'Antoine Jacque',company:'Antoine Jacque',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Belgium',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Belgium (Brussels).��imited details.'},
+  {name:'Nikolaos Mitakidis',company:'Nikolaos Mitakidis',phone:'+30 6942 529449',email:'',type:'Brand',size:'Medium',preferred_contact:'Phone',location:'Patra, Greece',priority:'Cold',interests:['Custom','Blanks'],event_name:'Texworld Paris 26',notes:'Met a couple of times. Address: 26 Akti Dima str., Patra, Greece.'},
+  {name:'Sovt',company:'Sovt Brand',phone:'',email:'',type:'Brand',size:'Small',preferred_contact:'Unknown',location:'Unknown',priority:'Cold',interests:['Blanks','Custom'],event_name:'Texworld Paris 26',notes:'Brand contact. Limited details.'}
+];
+
+// ── CONSTANTS & STATE ──────────────────────────────────────────────────
+var STAGES=['New','Reached Out','Pending Reply','Proposal Sent','In Discussion','Won','Dropped'];
+var STAGE_COLORS={'New':'#6f7280','Reached Out':'#60a5fa','Pending Reply':'#fbbf24','Proposal Sent':'#a89cff','In Discussion':'#fb923c','Won':'#4ade80','Dropped':'#f87171'};
+var STAGE_CSS={'New':'stage-new','Reached Out':'stage-reached','Pending Reply':'stage-pending','Proposal Sent':'stage-proposal','In Discussion':'stage-discussion','Won':'stage-won','Dropped':'stage-dropped'};
+var contacts=[],currentEvent='All',currentModalContact=null,currentEmailContact=null,currentEmailTab=0;
+var currentFilters={priority:'All',size:'All',stage:'All'},currentStageFilter=null,currentSort={field:'score',dir:-1};
+var chartInstances={},editingId=null;
+
+// ── THEME ─────────────────────────────────────────────────────
+function toggleTheme(){var l=document.body.classList.toggle('light');document.getElementById('theme-btn').textContent=l?'☀️':'🌙';localStorage.setItem('tl-theme',l?'light':'dark');}
+function applyTheme(l){if(l){document.body.classList.add('light');document.getElementById('theme-btn').textContent='☀️';}else{document.body.classList.remove('light');document.getElementById('theme-btn').textContent='🌙';}}
+
+// ── SCORE ─────────────────────────────────────────────────────
+function calcScore(c){var s={Enterprise:48,Large:38,Medium:28,Small:16,Startup:12}[c.size]||12;var p={'Big Fish':42,Hot:32,Warm:18,Cold:4}[c.priority]||4;return Math.min(100,s+p+(c.email?5:0)+(c.phone?3:0));}
+function scoreColor(s){if(s>=80)return'#4ade80';if(s>=60)return'#a89cff';if(s>=40)return'#60a5fa';if(s>=25)return'#fb923c';return'#6b7280';}
+
+// ── LOAD ──────────────────────────────────────────────────────
+async function loadFromStorage() {
+  var status=document.getElementById('storage-status');
+  status.textContent='⏳ Connecting to Supabase...';
+  try {
+    var r=await sb.from('leads').select('*').order('score',{ascending:false});
+    if(r.error)throw r.error;
+    var leads=r.data;
+    if(!leads||!leads.length){
+      status.textContent='⏳ Seeding database with Texworld leads...';
+      var seedRows=SEED_DATA.map(function(s){var row=Object.assign({},s);row.score=calcScore({size:s.size,priority:s.priority,email:s.email,phone:s.phone});return row;});
+      var sr=await sb.from('leads').insert(seedRows).select();
+      if(sr.error)throw sr.error;
+      leads=sr.data;
+    }
+    contacts=leads.map(function(row){var c=mapRow(row);c.score=calcScore(c);return c;});
+    status.textContent='✅ '+contacts.length+' leads loaded from Supabase';
+    buildCharts();renderEventBar();refresh();
+  } catch(err) {
+    console.error('Load error:',err);
+    status.style.color='var(--red)';status.textContent='⚠️ Error: '+err.message;
+    document.getElementById('contacts-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--red)">Failed to load: '+err.message+'</td></tr>';
+  }
+}
+
+// ── STAGE & NOTES ─────────────────────────────────────────────
+function getStage(name){var c=contacts.find(function(x){return x.name===name;});return c?(c.stage||'New'):'New';}
+async function setStage(id,name,stage){
+  var update={stage:stage};
+  var c=contacts.find(function(x){return x.id===id;});
+  if(stage==='Pending Reply'&&c&&!c.pendingSince)update.pending_since=new Date().toISOString();
+  var r=await sb.from('leads').update(update).eq('id',id).select().single();
+  if(!r.error&&r.data&&c){c.stage=r.data.stage;c.pendingSince=r.data.pending_since;}
+}
+function getPendingDays(name){var c=contacts.find(function(x){return x.name===name;});if(!c||!c.pendingSince)return 0;return Math.floor((Date.now()-new Date(c.pendingSince))/86400000);}
+async function savePersonalNote(){
+  if(!currentModalContact)return;
+  var note=document.getElementById('m-personal-notes').value;
+  var r=await sb.from('leads').update({personal_note:note}).eq('id',currentModalContact.id);
+  if(!r.error){currentModalContact.personalNote=note;var b=document.querySelector('.save-note-btn');b.textContent='Saved!';setTimeout(function(){b.textContent='Save Note';},1500);}
+  else alert('Failed to save note: '+r.error.message);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function prioBadge(p){var m={'Big Fish':'prio-bigfish',Hot:'prio-hot',Warm:'prio-warm',Cold:'prio-cold'};var i={'Big Fish':'🐟 Big Fish',Hot:'🔥 Hot',Warm:'🌤 Warm',Cold:'❄ Cold'};return'<span class="badge '+(m[p]||'prio-cold')+'">'+(i[p]||p)+'</span>';}
+function sizeBadge(s){var m={Enterprise:'size-ent',Large:'size-large',Medium:'size-medium',Small:'size-small',Startup:'size-startup'};return'<span class="badge '+(m[s]||'size-small')+'">'+s+'</span>';}
+function stageBadge(st){return'<span class="badge '+(STAGE_CSS[st]||'stage-new')+'">'+st+'</span>';}
+function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function getEvents(){var ev={};contacts.forEach(function(c){if(c.event)ev[c.event]=true;});return Object.keys(ev).sort();}
+function filteredContacts(){if(currentEvent==='All')return contacts;return contacts.filter(function(c){return c.event===currentEvent;});}
+
+// ── EVENT BAR ─────────────────────────────────────────────────
+function renderEventBar(){
+  var events=getEvents();
+  var html='<button class="event-tab all-tab'+(currentEvent==='All'?' active':'')+'" onclick="switchEvent(\'All\')">🌐 All Leads ('+contacts.length+')</button>';
+  events.forEach(function(ev){var count=contacts.filter(function(c){return c.event===ev;}).length;html+='<button class="event-tab'+(currentEvent===ev?' active':'')+'" onclick="switchEvent(\''+esc(ev)+'\')">📍 '+ev+' ('+count+')</button>';});
+  document.getElementById('event-bar').innerHTML=html;
+  document.getElementById('hdr-sub').textContent=currentEvent==='All'?'All events · '+contacts.length+' total leads':'📍 '+currentEvent+' · '+filteredContacts().length+' leads';
+}
+function switchEvent(ev){currentEvent=ev;renderEventBar();buildCharts();refresh();}
+
+// ── KPIs ──────────────────────────────────────────────────────
+function updateKPIs(){
+  var fc=filteredContacts(),total=fc.length,avg=total?Math.round(fc.reduce(function(a,c){return a+c.score;},0)/total):0;
+  document.getElementById('k'total').textContent=total;document.getElementById('k-avgscore').textContent=avg;
+  document.getElementById('k-entlarge').textContent=fc.filter(function(c){return c.size==='Enterprise'||c.size==='Large';}).length;
+  document.getElementById('k-bigfish').textContent=fc.filter(function(c){return c.priority==='Big Fish';}).length;
+  document.getElementById('k+contacted').textContent=fc.filter(function(c){return c.stage&&c.stage!=='New';}).length;
+  document.getElementById('k-remaining').textContent=fc.filter(function(c){return!c.stage||c.stage==='New';}).length;
+  document.getElementById('k-pending').textContent=fc.filter(function(c){return c.stage==='Pending Reply';}).length;
+  document.getElementById('k-won').textContent=fc.filter(function(c){return c.stage==='Won';}).length;
+}
+
+// ── FOCUS ─────────────────────────────────────────────────────
+function renderFocus(){
+  var fc=filteredContacts();var unc=fc.filter(function(c){return!c.stage||c.stage==='New';}).sort(function(a,b){return b.score-a.score;});var top=unc.slice(0,5);
+  var html='';
+  if(!top.length){html='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🎉</div><p>All leads contacted!</p></div>';}
+  else{top.forEach(function(c,i){html+='<div class="focus-item" onclick="openModal(\''+esc(c.name)+'\')">'+'<div class="fi-rank">#'+(i+1)+'</div>'+'<div class="fi-score" style="color:'+scoreColor(c.score)+'">'+c.score+'</div>'+'<div class="fi-name">'+c.name+'</div>'+'<div class="fi-company">'+c.company+'</div>'+'<div class="fi-tags">'+prioBadge(c.priority)+'</div>'+'</div>';});}
+  document.getElementById('focus-grid').innerHTML=html;document.getElementById('focus-sub').textContent=unc.length+' uncontacted remaining';
+}
+
+// ── FOLLOW-UP ─────────────────────────────────────────────────
+function renderFollowUp(){
+  var fc=filteredContacts();var pend=fc.filter(function(c){return c.stage==='Pending Reply';});var card=document.getElementById('followup-card');
+  if(!pend.length){card.style.display='none';return;}card.style.display='block';
+  pend.sort(function(a,b){return getPendingDays(b.name)-getPendingDays(a.name);});
+  var ov=pend.filter(function(c){return getPendingDays(c.name)>=2;});
+  document.getElementById('fu-badge').textContent=ov.length+' overdue';
+  document.getElementById('fu-sub').textContent=pend.length+' lead(s) replied — they are waiting on you';
+  document.getElementById('followup-grid').innerHTML=pend.map(function(c){var d=getPendingDays(c.name);return'<div class="fu-item'+(d>=2?' urgent':'')+'" onclick="openModal(\''+esc(c.name)+'\')">'+'<div class="fu-name">'+c.name+'</div>'+'<div class="fu-company">'+c.company+'</div>'+'<div class="fu-days">'+(d===0?'Today':d===1?'1 day ago':d+'d waiting')+'</div>'+'</div>';}).join('');
+}
+
+// ── PIPELINE ──────────────────────────────────────────────────
+function renderPipeline(){
+  var fc=filteredContacts();var counts={};STAGES.forEach(function(s){counts[s]=0;});fc.forEach(function(c){var st=c.stage||'New';counts[st]=(counts[st]||0)+1;});
+  var icons={'New':'📄','Reached Out':'👈','Pending Reply':'🔔','Proposal Sent':'📋','In Discussion':'💬','Won':'✅','Dropped':'❌'};
+  document.getElementById('pipe-stages').innerHTML=STAGES.map(function(st){return'<div class="pipe-stage'+(currentStageFilter===st?' active':'')+'" onclick="filterByStage(\''+st+'\')"><div class="ps-label">'+(icons[st]||'')+' '+st+'</div><div class="ps-count">'+(counts[st]||0)+'</div><div class="ps-bar" style="background:'+(STAGE_COLORS[st]||'#6c63ff')+'"></div></div>';}).join('');
+}
+
+// ── CHARTS ────────────────────────────────────────────────────
+function buildCharts(){var fc=filteredContacts();buildDonut('chartSize',['Enterprise','Large','Medium','Small','Startup'],['#a89cff','#34d399','#60a5fa','#fbbf24','#f472b6'],function(s){return fc.filter(function(c){return c.size===s;}).length;});buildDonut('chartPrio',['Big Fish','Hot','Warm','Cold'],['#f87171','#fb923c','#60a5fa','#6b7280'],function(p){return fc.filter(function(c){return c.priority===p;}).length;});buildDonut('chartContact',['Email','WhatsApp','Phone','Unknown'],['#4ade80','#34d399','#60a5fa','#9ca3af'],function(m){return fc.filter(function(c){return c.preferredContact===m;}).length;});buildHBar('chartInterests',topCounts(fc,function(c){return c.interests||[];},8));buildHBar('chartGeo',topCounts(fc,function(c){return[(c.location||'Unknown').split(',')[0].trim().split('/')[0].trim()];},8));buildStackedBar('chartMatrix',fc);}
+function buildDonut(id,labels,colors,fn){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;chartInstances[id]=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:labels.map(fn),backgroundColor:colors,borderColor:'transparent',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a9aba',font:{size:10},boxWidth:10,padding:8}}}}});}
+function buildHBar(id,data){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;chartInstances[id]=new Chart(ctx,{type:'bar',data:{labels:data.labels,datasets:[{data:data.values,backgroundColor:'#6c63ff88',borderColor:'#6c63ff',borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7a7a9a',font:{size:9}},grid:{color:'#2a2a4a22'},beginAtZero:true},y:{ticks:{color:'#c8c8e8',font:{size:10}},grid:{display:false}}}}});}
+function buildStackedBar(id,fc){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;var sizes=['Enterprise','Large','Medium','Small','Startup'];var prios=['Big Fish','Hot','Warm','Cold'];var colors={'Big Fish':'#f87171',Hot:'#fb923c',Warm:'#60a5fa',Cold:'#6b7280'};chartInstances[id]=new Chart(ctx,{type:'bar',data:{labels:sizes,datasets:prios.map(function(p){return{label:p,data:sizes.map(function(s){return fc.filter(function(c){return c.size===s&&c.priority===p;}).length;}),backgroundColor:colors[p],borderRadius:2};})},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a9aba',font:{size:10},boxWidth:10}}},scales:{x:{stacked:true,ticks:{color:'#9a9aba',font:{size:10}},grid:{color:'#2a2a4a22'}},y:{stacked:true,ticks:{color:'#9a9aba',font:{size:9}},grid:{color:'#2a2a4a22'},beginAtZero:true}}}});}
+function topCounts(fc,keyFn,n){var counts={};fc.forEach(function(c){keyFn(c).forEach(function(k){counts[k]=(counts[k]||0)+1;});});var sorted=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).slice(0,n);return{labels:sorted,values:sorted.map(function(k){return counts[k];})};}
+
+// ── EMAIL HUB ─────────────────────────────────────────────────
+function renderEmailHub(){var fc=filteredContacts();var needs=fc.filter(function(c){return(c.stage==='New'||c.stage==='Reached Out')&&(c.email||c.phone);}).sort(function(a,b){return b.score-a.score;}).slice(0,9);if(!needs.length){document.getElementById('email-hub-grid').innerHTML='<div class="empty-state"><div class="es-icon">✓</div><p>All actionable leads contacted!</p></div>';return;}document.getElementById('email-hub-grid').innerHTML=needs.map(function(c){var st=c.stage||'New';return'<div class="email-card" onclick="openModal(\''+esc(c.name)+'\')"><div class="ec-name">'+c.name+(c.phone?'<span class="wa-badge">📱 WA</span>':'')+'</div><div class="ec-company">'+c.company+'</div><span class="badge '+(STAGE_CSS[st]||'stage-new')+'">'+st+'</span> '+prioBadge(c.priority)+'</div>';}).join('');}
+
+// ── EMAIL TEMPLATES ───────────────────────────────────────────
+function getEmailTemplates(c){var fn=c.name.split(' ')[0];var int=(c.interests||[]).slice(0,2).join(' and ');var co=c.company;var st=c.stage||'New';var sm={'New':{label:'Initial Outreach',subject:'Great meeting you at '+(c.event||'the show')+' — Threadlab',body:'Hi '+fn+',\n\nGreat connecting with you at '+(c.event||'the show')+'! Pleasure meeting the '+co+' team.\n\nAs discussed, Threadlab specialises in '+int+'. I think we could be a strong fit.\n\nWould you have 15 minutes for a quick call this week?\n\nDaniel\nThreadlab\ndaniel@threadlab.com.au'},'Reached Out':{label:'Gentle Reminder',subject:'Quick follow-up — Threadlab',body:'Hi '+fn+',\n\nJust following up on my previous message about Threadlab.\n\nPost-show is a busy period — when you get a moment, I\'d love to hear your thoughts on '+int+'.\n\nDaniel\nThreadlab'},'Pending Reply':{label:'Reply to Their Message',subject:'Re: Threadlab x '+co,body:'Hi '+fn+',\n\nThanks for getting back to me!\n\nNext steps I\'d suggest:\n1. Send catalogue and pricing for '+int+'\n2. Schedule a call to go through any questions\n3. Get a sample order moving\n\nDoes that work?\n\nDaniel\nThreadlab'},'Proposal Sent':{label:'Follow Up on Proposal',subject:'Checking in — Threadlab x '+co,body:'Hi '+fn+',\n\nJust checking in on the proposal for '+co+'.\n\nHappy to adjust pricing, MOQs or product selection.\n\nDaniel\nThreadlab'},'In Discussion':{label:'Next Steps',subject:'Next steps — Threadlab x '+co,body:'Hi '+fn+',\n\nFollowing on from our conversation — confirming next steps:\n1. Threadlab to send revised pricing/samples for '+int+'\n2. '+co+' to review and provide feedback\n3. Agree on timeline and first order\n\nDaniel\nThreadlab'},'Won':{label:'Welcome Onboard',subject:'Welcome to Threadlab, '+fn+'!',body:'Hi '+fn+',\n\nWelcome to the Threadlab family — so excited to be working with '+co+'!\n\nOur team will be in touch within 24 hours to confirm your order details.\n\nDaniel'},'Dropped':{label:'Re-Engagement',subject:'Checking in — Threadlab',body:'Hi '+fn+',\n\nHope you\'re well! We\'ve had some exciting updates at Threadlab that might be relevant for '+co+' around '+int+'.\n\nDaniel\nThreadlab'}};return[sm[st]||sm['New'],{label:'Follow-Up',subject:'Following up — Threadlab x '+co,body:'Hi '+fn+',\n\nJust following up — I know post-show is busy!\n\nI think there\'s a great fit around '+int+'. Would love 15 minutes to show you what we\'re building.\n\nDaniel\nThreadlab'},{label:'Samples Offer',subject:'Free samples for '+co+' — Threadlab',body:'Hi '+fn+',\n\nWe\'d love to send you a complimentary sample pack. Based on your interest in '+int+', I\'ll curate a selection specifically for '+co+'.\n\nJust need your shipping address!\n\nDaniel\nThreadlab'}];}
+function renderEmailTabs(c){var tpls=getEmailTemplates(c);document.getElementById('email-tab-bar').innerHTML=tpls.map(function(t,i){return'<button class="email-tab'+(i===currentEmailTab?' active':'')+'" onclick="switchEmailTab('+i+')">'+t.label+'</button>';}).join('');var tpl=tpls[currentEmailTab];document.getElementById('email-subject').value=tpl.subject;document.getElementById('email-body').value=tpl.body;}
+function switchEmailTab(i){currentEmailTab=i;renderEmailTabs(currentEmailContact);}
+function openInEmailClient(){var e=currentEmailContact&&currentEmailContact.email;window.open('mailto:'+(e||'')+'?subject='+encodeURIComponent(document.getElementById('email-subject').value)+'&body='+encodeURIComponent(document.getElementById('email-body').value));}
+function copyEmailToClipboard(){navigator.clipboard.writeText('Subject: '+document.getElementById('email-subject').value+'\n\n'+document.getElementById('email-body').value).then(function(){var b=document.querySelector('.btn-copy-email');b.textContent='Copied!';setTimeout(function(){b.textContent='📋 Copy Email';},2000);});}
+
+// ── WHATSAPP ──────────────────────────────────────────────────
+function getWAMsg(c){var fn=c.name.split(' ')[0];var int=(c.interests||[]).slice(0,2).join(' and ');var st=c.stage||'New';var m={'New':'Hi '+fn+'! Great meeting you at '+(c.event||'the show')+'. I\'m Daniel from Threadlab — we spoke about '+int+'. Would love to follow up!','Reached Out':'Hi '+fn+', Daniel from Threadlab. Just following up on my message about '+int+'. Even a quick reply works!','Pending Reply':'Hi '+fn+', thanks for getting back to me! Shall we jump on a quick call or I can send more info?','Proposal Sent':'Hi '+fn+', Daniel from Threadlab. Just checking in on the proposal — happy to adjust anything around '+int+'.','In Discussion':'Hi '+fn+', following up on our conversation about '+int+'. Let me know if anything has changed.','Won':'Hi '+fn+'! So excited to have '+c.company+' on board. Our team will be in touch shortly!','Dropped':'Hi '+fn+', Daniel from Threadlab. Hope you\'re well — we\'ve had some exciting updates that might suit '+c.company+'.'};return m[st]||m['New'];}
+function openWhatsApp(){if(!currentEmailContact||!currentEmailContact.phone)return;window.open('https://wa.me/'+currentEmailContact.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(getWAMsg(currentEmailContact)),'_blank');}
+
+// ── NEXT STEPS ────────────────────────────────────────────────
+function getNextSteps(c){var st=c.stage||'New';var m={'New':['Send initial outreach referencing your meeting at '+(c.event||'the show'),'Connect on LinkedIn to warm up the relationship',c.preferredContact==='WhatsApp'?'Send a WhatsApp — this is their preferred channel':null,'Share the Threadlab lookbook / catalogue'],'Reached Out':['Follow up if no response in 3-5 days','Try a different channel: '+(c.phone?'Phone/WhatsApp at '+c.phone:'LinkedIn'),'Share a relevant case study or product image'],'Pending Reply':['They replied — respond within 24 hours','Address their questions','Propose a call to move forward faster'],'Proposal Sent':['Follow up if no response in 5-7 days','Offer to adjust pricing or MOQs','Suggest a call to walk through the proposal'],'In Discussion':['Confirm agreed next steps in writing','Prepare sample order or invoice','Check in every 3-4 days','Get a commitment on timeline and first order size'],'Won':['Send formal invoice and order confirmation','Introduce them to the Threadlab production team','Ask for a referral after delivery'],'Dropped':['Re-engage after 4-6 weeks with fresh context','Share something new (product launch, price update)','Keep on quarterly newsletter list']};return(m[st]||m['New']).filter(Boolean);}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(name){
+  var c=contacts.find(function(x){return x.name===name;});if(!c)return;
+  currentModalContact=c;currentEmailContact=c;currentEmailTab=0;
+  var sc=document.getElementById('m-score');sc.textContent=c.score;sc.style.color=scoreColor(c.score);
+  document.getElementById('m-name').textContent=c.name;document.getElementById('m-company').textContent=c.company;
+  document.getElementById('m-tags').innerHTML=prioBadge(c.priority)+' '+sizeBadge(c.size)+'<span class="badge size-medium">'+c.type+'</span>'+(c.event?'<span class="event-badge">📍 '+c.event+'</span>':'');
+  var ci='';if(c.email)ci+='<a href="mailto:'+c.email+'">'+c.email+'</a> <button class="copy-btn" onclick="navigator.clipboard.writeText(\''+c.email+'\')">Copy</button>';if(c.phone)ci+=(ci?'<br>':'')+c.phone+' <button class="copy-btn" onclick="navigator.clipboard.writeText(\''+c.phone+'\')">Copy</button>';if(!ci)ci='<span style="color:var(--text3)">No contact info captured</span>';
+  document.getElementById('m-contact').innerHTML=ci;document.getElementById('m-location').textContent=c.location||'Unknown';
+  document.getElementById('m-stage-select').value=c.stage||'New';
+  document.getElementById('m-interests').innerHTML=(c.interests||[]).map(function(i){return'<span class="tag-interest">'+i+'</span>';}).join('');
+  document.getElementById('m-notes').textContent=c.notes||'No notes recorded.';document.getElementById('m-personal-notes').value=c.personalNote||'';
+  document.getElementById('btn-whatsapp').style.display=c.phone?'inline-flex':'none';
+  renderEmailTabs(c);document.getElementById('m-next-steps').innerHTML='<ul>'+getNextSteps(c).map(function(s){return'<li>'+s+'</li>';}).join('')+'</ul>';
+  document.getElementById('lead-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('lead-modal').classList.remove('open');currentModalContact=null;refresh();}
+async function saveStage(){if(!currentModalContact)return;var stage=document.getElementById('m-stage-select').value;await setStage(currentModalContact.id,currentModalContact.name,stage);currentModalContact.stage=stage;renderEmailTabs(currentModalContact);document.getElementById('m-next-steps').innerHTML='<ul>'+getNextSteps(currentModalContact).map(function(s){return'<li>'+s+'</li>';}).join('')+'</ul>';}
+
+// ── ADD/EDIT FORM ─────────────────────────────────────────────
+function showEventSuggestions(){var val=document.getElementById('f-event').value.trim().toLowerCase();var events=getEvents();var matches=val?events.filter(function(e){return e.toLowerCase().indexOf(val)!==-1;}):events;var box=document.getElementById('event-suggestions');if(!matches.length){box.style.display='none';return;}box.innerHTML=matches.map(function(e){return'<div class="event-suggestion" onmousedown="selectEvent(\''+esc(e)+'\')">'+e+'</div>';}).join('');box.style.display='block';}
+function selectEvent(e){document.getElementById('f-event').value=e;document.getElementById('event-suggestions').style.display='none';}
+document.addEventListener('click',function(e){if(!e.target.closest('.event-input-wrap'))document.getElementById('event-suggestions').style.display='none';});
+function openAddModal(){editingId=null;document.getElementById('form-modal-title').textContent='+ Add New Lead';document.getElementById('form-save-btn').textContent='Save Lead';['f-name','f-company','f-email','f-phone','f-location','f-interests','f-notes','f-event'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('f-type').value='Brand';document.getElementById('f-size').value='Medium';document.getElementById('f-priority').value='Warm';document.getElementById('f-contact').value='Email';if(currentEvent!=='All')document.getElementById('f-event').value=currentEvent;document.getElementById('form-modal').classList.add('open');}
+function openEditModal(){var c=currentModalContact;if(!c)return;editingId=c.id;document.getElementById('form-modal-title').textContent='✏️ Edit Lead';document.getElementById('form-save-btn').textContent='Update Lead';document.getElementById('f-name').value=c.name;document.getElementById('f-company').value=c.company;document.getElementById('f-email').value=c.email||'';document.getElementById('f-phone').value=c.phone||'';document.getElementById('f-type').value=c.type||'Brand';document.getElementById('f-size').value=c.size||'Medium';document.getElementById('f-priority').value=c.priority||'Warm';document.getElementById('f-contact').value=c.preferredContact||'Email';document.getElementById('f-location').value=c.location||'';document.getElementById('f-event').value=c.event||'';document.getElementById('f-interests').value=(c.interests||[]).join(', ');document.getElementById('f-notes').value=c.notes||'';document.getElementById('form-modal').classList.add('open');}
+function closeFormModal(){document.getElementById('form-modal').classList.remove('open');}
+async function saveFormLead(){
+  var name=document.getElementById('f-name').value.trim();var company=document.getElementById('f-company').value.trim();
+  if(!name||!company){alert('Name and company are required.');return;}
+  if(!editingId&&contacts.find(function(x){return x.name===name;})){alert('A lead with this name already exists.');return;}
+  var payload={name:name,company:company,email:document.getElementById('f-email').value.trim(),phone:document.getElementById('f-phone').value.trim(),type:document.getElementById('f-type').value,size:document.getElementById('f-size').value,priority:document.getElementById('f-priority').value,preferredContact:document.getElementById('f-contact').value,location:document.getElementById('f-location').value.trim(),event:document.getElementById('f-event').value.trim()||'Unknown Event',interests:document.getElementById('f-interests').value.split(',').map(function(s){return s.trim();}).filter(Boolean),notes:document.getElementById('f-notes').value.trim()};
+  payload.score=calcScore(payload);
+  try{
+    var dbRow=toDbRow(payload);var r,saved;
+    if(editingId){r=await sb.from('leads').update(dbRow).eq('id',editingId).select().single();if(r.error)throw r.error;saved=mapRow(r.data);saved.score=calcScore(saved);var idx=contacts.findIndex(function(x){return x.id===editingId;});if(idx>-1)contacts[idx]=saved;closeFormModal();openModal(saved.name);}
+    else{r=await sb.from('leads').insert(dbRow).select().single();if(r.error)throw r.error;saved=mapRow(r.data);saved.score=calcScore(saved);contacts.push(saved);closeFormModal();}
+    renderEventBar();buildCharts();refresh();
+  }catch(e){console.error('Failed to save lead',e);alert('Failed to save lead: '+e.message);}
+}
+
+// ── FILTERS & TABLE ───────────────────────────────────────────
+function filterByStage(st){if(currentStageFilter===st){currentStageFilter=null;currentFilters.stage='All';}else{currentStageFilter=st;currentFilters.stage=st;}document.querySelectorAll("[data-f='stage']").forEach(function(b){b.classList.toggle('on',b.dataset.v===(currentStageFilter||'All'));});renderPipeline();applyFilters();}
+function sortBy(f){if(currentSort.field===f)currentSort.dir*=-1;else{currentSort.field=f;currentSort.dir=-1;}applyFilters();}
+function applyFilters(){var search=(document.getElementById('search-input').value||'').toLowerCase();var fc=filteredContacts();var rows=fc.filter(function(c){if(currentFilters.priority!=='All'&&c.priority!==currentFilters.priority)return false;if(currentFilters.size!=='All'&&c.size!==currentFilters.size)return false;if(currentFilters.stage!=='All'&&(c.stage||'New')!==currentFilters.stage)return false;if(search){var h=(c.name+' '+c.company+' '+(c.interests||[]).join(' ')+' '+(c.notes||'')).toLowerCase();if(h.indexOf(search)===-1)return false;}return true;});rows.sort(function(a,b){var av=a[currentSort.field],bv=b[currentSort.field];if(typeof av==='string')av=av.toLowerCase();if(typeof bv==='string')bv=bv.toLowerCase();return av<bv?-currentSort.dir:av>bv?currentSort.dir:0;});document.getElementById('table-count').textContent=rows.length+' of '+fc.length+' leads';renderTable(rows);}
+function renderTable(rows){var html='';if(!rows.length){html='<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">No contacts match your filters</td></tr>';}else{rows.forEach(function(c){var st=c.stage||'New';var ci=c.email?'<a href="mailto:'+c.email+'" style="color:var(--blue)">'+c.email+'</a>':(c.phone?'<span style="color:var(--text2)">'+c.phone+'</span>':'<span style="color:var(--text3)">—</span>');html+='<tr onclick="openModal(\''+esc(c.name)+'\')"><td style="font-weight:600;color:var(--text)">'+c.name+'</td><td style="color:var(--text2)">'+c.company+'</td><td>'+ci+'</td><td><span class="event-badge" style="font-size:9px">'+(c.event||'—')+'</span></td><td>'+sizeBadge(c.size)+'</td><td><span class="score-pill" style="background:'+scoreColor(c.score)+'">'+c.score+'</span></td><td>'+prioBadge(c.priority)+'</td><td>'+stageBadge(st)+'</td><td style="color:var(--text3);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(c.notes||'').substring(0,55)+((c.notes||'').length>55?'…':'')+'</td></tr>';});}document.getElementById('contacts-tbody').innerHTML=html;}
+document.addEventListener('click',function(e){var btn=e.target.closest('.fb');if(!btn)return;var f=btn.dataset.f,v=btn.dataset.v;if(!f||!v)return;currentFilters[f]=v;document.querySelectorAll("[data-f='"+f+"']").forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});applyFilters();});
+document.getElementById('lead-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('form-modal').addEventListener('click',function(e){if(e.target===this)closeFormModal();});
+
+// ── EXPORT CSV ────────────────────────────────────────────────
+function exportCSV(){var headers=['Name','Company','Email','Phone','Type','Size','Priority','Contact','Location','Event','Score','Stage','Interests','Notes'];var rows=filteredContacts().map(function(c){return[c.name,c.company,c.email,c.phone,c.type,c.size,c.priority,c.preferredContact,c.location,c.event||'',c.score,c.stage||'New',(c.interests||[]).join('; '),(c.notes||'').replace(/,/g,';')].map(function(v){return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');});var blob=new Blob([[headers.join(',')].concat(rows).join('\n')],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='threadlab-leads.csv';a.click();}
+
+// ── REFRESH & BOOT ────────────────────────────────────────────
+function refresh(){updateKPIs();renderFocus();renderFollowUp();renderPipeline();renderEmailHub();applyFilters();}
+
+window.addEventListener('DOMContentLoaded', async function() {
+  var r = await sb.auth.getSession();
+  if (r.data && r.data.session) { showApp(); loadFromStorage(); }
+});
+</script>
+</body>
+</html>
