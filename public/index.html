@@ -845,12 +845,21 @@ function initGmail() {
       }
       gmailAccessToken = resp.access_token;
       gmailTokenExpiry = Date.now() + (resp.expires_in - 60) * 1000;
+      try { sessionStorage.setItem('gm_token', gmailAccessToken); sessionStorage.setItem('gm_expiry', String(gmailTokenExpiry)); } catch(e) {}
       updateGmailUI(true);
       // If a lead modal is open, load their thread immediately
       if (currentModalContact) loadGmailThread(currentModalContact);
     }
   });
-  // If user had previously connected in this session, show the UI
+  // Restore token from sessionStorage if still valid (survives page refresh)
+  try {
+    var storedToken = sessionStorage.getItem('gm_token');
+    var storedExpiry = parseInt(sessionStorage.getItem('gm_expiry') || '0', 10);
+    if (storedToken && storedExpiry && Date.now() < storedExpiry) {
+      gmailAccessToken = storedToken;
+      gmailTokenExpiry = storedExpiry;
+    }
+  } catch(e) {}
   if (gmailAccessToken && Date.now() < gmailTokenExpiry) updateGmailUI(true);
 }
 
@@ -867,6 +876,7 @@ function connectGmail() {
   if (gmailAccessToken && Date.now() < gmailTokenExpiry) {
     gmailAccessToken = null;
     gmailTokenExpiry = 0;
+    try { sessionStorage.removeItem('gm_token'); sessionStorage.removeItem('gm_expiry'); } catch(e) {}
     updateGmailUI(false);
     return;
   }
