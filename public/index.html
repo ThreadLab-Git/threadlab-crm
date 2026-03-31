@@ -256,6 +256,7 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
   <div class="hdr-right">
     <button class="btn theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
     <button class="btn btn-primary" onclick="openAddModal()">+ Add Lead</button>
+    <button class="btn" onclick="openImportModal()">↑ Import CSV</button>
     <button class="btn" onclick="exportCSV()">↓ Export CSV</button>
     <button class="btn btn-gmail" id="gmail-btn" onclick="connectGmail()" title="Connect Gmail to send emails and view threads">📧 Connect Gmail</button>
     <button class="btn btn-logout" onclick="doLogout()">Sign Out</button>
@@ -471,6 +472,39 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
   </div>
 </div>
 </div><!-- end #main-app -->
+
+<!-- CSV IMPORT MODAL -->
+<div class="import-backdrop" id="import-modal">
+  <div class="import-box">
+    <button class="modal-close" onclick="closeImportModal()">✕</button>
+    <div class="import-title">↑ Import Leads from CSV</div>
+    <div class="import-sub">Upload a CSV file to bulk-add leads. Supports Threadlab exports or any CSV with name &amp; company columns.</div>
+    <div class="import-drop" id="import-drop" onclick="document.getElementById('import-file-input').click()" ondragover="importDragOver(event)" ondragleave="importDragLeave(event)" ondrop="importDrop(event)">
+      <div class="import-drop-icon">📂</div>
+      <div class="import-drop-lbl">Click to choose a CSV file, or drag &amp; drop it here</div>
+      <div class="import-drop-sub">Supported columns: Name, Company, Email, Phone, Type, Size, Priority, Contact, Location, Event, Stage, Interests, Notes</div>
+      <input type="file" id="import-file-input" accept=".csv,text/csv" onchange="handleImportFile(this.files[0])">
+    </div>
+    <div class="import-preview" id="import-preview" style="display:none;">
+      <div class="import-preview-hdr">
+        <div class="import-preview-title">Preview</div>
+        <div class="import-preview-count" id="import-preview-count"></div>
+      </div>
+      <div class="import-table-wrap">
+        <table class="import-table">
+          <thead><tr id="import-thead"></tr></thead>
+          <tbody id="import-tbody"></tbody>
+        </table>
+      </div>
+      <div class="import-warning" id="import-warning" style="display:none;"></div>
+    </div>
+    <div class="import-actions" id="import-actions" style="display:none;">
+      <button class="import-btn" id="import-confirm-btn" onclick="doImportLeads()">↑ Import Leads</button>
+      <button class="btn" onclick="resetImportModal()">Choose Different File</button>
+      <span class="import-status" id="import-status"></span>
+    </div>
+  </div>
+</div>
 
 <!-- GMAIL COMPOSE MODAL -->
 <div class="gm-compose-backdrop" id="gm-compose-modal">
@@ -805,6 +839,163 @@ document.getElementById('form-modal').addEventListener('click',function(e){if(e.
 
 // ── EXPORT CSV ────────────────────────────────────────────────
 function exportCSV(){var headers=['Name','Company','Email','Phone','Type','Size','Priority','Contact','Location','Event','Score','Stage','Interests','Notes'];var rows=filteredContacts().map(function(c){return[c.name,c.company,c.email,c.phone,c.type,c.size,c.priority,c.preferredContact,c.location,c.event||'',c.score,c.stage||'New',(c.interests||[]).join('; '),(c.notes||'').replace(/,/g,';')].map(function(v){return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');});var blob=new Blob([[headers.join(',')].concat(rows).join('\n')],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='threadlab-leads.csv';a.click();}
+
+// ── IMPORT CSV ────────────────────────────────────────────────
+var importRows = [];
+var importHeaders = [];
+
+function openImportModal() {
+  resetImportModal();
+  document.getElementById('import-modal').classList.add('open');
+}
+function closeImportModal() {
+  document.getElementById('import-modal').classList.remove('open');
+}
+function resetImportModal() {
+  importRows = [];
+  importHeaders = [];
+  document.getElementById('import-file-input').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-actions').style.display = 'none';
+  document.getElementById('import-status').textContent = '';
+  document.getElementById('import-warning').style.display = 'none';
+  document.getElementById('import-drop').classList.remove('dragging');
+}
+function importDragOver(e) { e.preventDefault(); document.getElementById('import-drop').classList.add('dragging'); }
+function importDragLeave(e) { document.getElementById('import-drop').classList.remove('dragging'); }
+function importDrop(e) { e.preventDefault(); importDragLeave(e); var f = e.dataTransfer.files[0]; if (f) handleImportFile(f); }
+function handleImportFile(file) {
+  if (!file || !file.name.match(/\.csv$/i)) { alert('Please select a .csv file.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) { parseAndPreviewCSV(e.target.result); };
+  reader.readAsText(file);
+}
+function parseCSVLine(line) {
+  var result = [], cur = '', inQ = false;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else cur += ch;
+  }
+  result.push(cur.trim());
+  return result;
+}
+function normalizeHeader(h) {
+  var map = {
+    'name':'name','full name':'name','contact name':'name','first name':'name','firstname':'name',
+    'company':'company','organization':'company','org':'company','company name':'company',
+    'email':'email','email address':'email','e-mail':'email',
+    'phone':'phone','mobile':'phone','phone number':'phone','whatsapp':'phone','tel':'phone',
+    'type':'type','lead type':'type',
+    'size':'size','company size':'size',
+    'priority':'priority',
+    'contact':'preferredContact','preferred contact':'preferredContact','contact method':'preferredContact',
+    'location':'location','city':'location','country':'location',
+    'event':'event','expo':'event','show':'event','event name':'event',
+    'stage':'stage','pipeline stage':'stage','status':'stage',
+    'interests':'interests','products':'interests','interest':'interests',
+    'notes':'notes','note':'notes','comments':'notes','comment':'notes'
+  };
+  return map[h.toLowerCase().replace(/[^a-z ]/g,'')] || null;
+}
+function parseAndPreviewCSV(text) {
+  var lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(function(l){return l.trim();});
+  if (lines.length < 2) { alert('CSV must have at least a header row and one data row.'); return; }
+  var rawHeaders = parseCSVLine(lines[0]);
+  importHeaders = rawHeaders.map(function(h){ return { raw: h, mapped: normalizeHeader(h) }; });
+  importRows = lines.slice(1).map(function(line){ return parseCSVLine(line); }).filter(function(r){ return r.some(function(c){return c.trim();}); });
+
+  // Find name + company columns
+  var hasName = importHeaders.some(function(h){ return h.mapped === 'name'; });
+  var hasCompany = importHeaders.some(function(h){ return h.mapped === 'company'; });
+
+  // Build preview
+  var previewCols = ['name','company','email','phone','event','type','size','priority','stage'];
+  var thHtml = previewCols.map(function(k){return '<th>'+k.charAt(0).toUpperCase()+k.slice(1)+'</th>';}).join('');
+  document.getElementById('import-thead').innerHTML = thHtml;
+
+  var tbHtml = importRows.slice(0, 10).map(function(row){
+    var obj = rowToObj(row);
+    return '<tr>' + previewCols.map(function(k){ return '<td title="'+(obj[k]||'')+'">'+((obj[k]||'') || '<span style="color:var(--text3)">—</span>')+'</td>'; }).join('') + '</tr>';
+  }).join('');
+  document.getElementById('import-tbody').innerHTML = tbHtml;
+  document.getElementById('import-preview-count').textContent = importRows.length + ' row' + (importRows.length !== 1 ? 's' : '') + ' found' + (importRows.length > 10 ? ' (showing first 10)' : '');
+  document.getElementById('import-preview').style.display = '';
+  document.getElementById('import-actions').style.display = '';
+  document.getElementById('import-confirm-btn').textContent = '↑ Import ' + importRows.length + ' Lead' + (importRows.length !== 1 ? 's' : '');
+
+  var warnings = [];
+  if (!hasName) warnings.push('No "Name" column detected — Name will be blank.');
+  if (!hasCompany) warnings.push('No "Company" column detected — Company will be blank.');
+  var warnEl = document.getElementById('import-warning');
+  if (warnings.length) { warnEl.textContent = '⚠️ ' + warnings.join('  '); warnEl.style.display = ''; }
+  else warnEl.style.display = 'none';
+}
+function rowToObj(row) {
+  var obj = {};
+  importHeaders.forEach(function(h, i){
+    if (h.mapped && row[i] !== undefined) obj[h.mapped] = row[i];
+  });
+  return obj;
+}
+function toImportDbRow(obj) {
+  var validTypes = ['Brand','Retail','Manufacturing','Print','Other'];
+  var validSizes = ['Enterprise','Large','Medium','Small','Startup'];
+  var validPriorities = ['Big Fish','Hot','Warm','Cold'];
+  var validContacts = ['Email','Phone','WhatsApp','Unknown'];
+  var validStages = ['New','Contacted','Pending Reply','Follow Up','Won','Lost'];
+  function pick(val, list, def) { return list.indexOf(val) > -1 ? val : def; }
+  var interests = obj.interests ? obj.interests.split(/[;,]/).map(function(s){return s.trim();}).filter(Boolean) : [];
+  return {
+    name: obj.name || '',
+    company: obj.company || '',
+    email: obj.email || '',
+    phone: obj.phone || '',
+    type: pick(obj.type, validTypes, 'Brand'),
+    size: pick(obj.size, validSizes, 'Medium'),
+    priority: pick(obj.priority, validPriorities, 'Warm'),
+    preferred_contact: pick(obj.preferredContact, validContacts, 'Email'),
+    location: obj.location || '',
+    event_name: obj.event || '',
+    interests: interests,
+    notes: obj.notes || '',
+    stage: pick(obj.stage, validStages, 'New'),
+    score: 0
+  };
+}
+async function doImportLeads() {
+  if (!importRows.length) return;
+  var btn = document.getElementById('import-confirm-btn');
+  var status = document.getElementById('import-status');
+  btn.disabled = true;
+  status.textContent = 'Importing…';
+  try {
+    var dbRows = importRows.map(function(row){ var obj = rowToObj(row); var dbRow = toImportDbRow(obj); dbRow.score = calcScore({size:dbRow.size,priority:dbRow.priority,email:dbRow.email,phone:dbRow.phone}); return dbRow; });
+    var { data, error } = await sb.from('leads').insert(dbRows).select();
+    if (error) throw error;
+    // Add to local contacts array
+    (data || []).forEach(function(row){ var c = mapRow(row); c.score = calcScore(c); contacts.push(c); });
+    // Log activity for each
+    for (var i = 0; i < (data||[]).length; i++) {
+      await sb.from('activity_logs').insert({ lead_id: data[i].id, lead_name: data[i].name, action: 'created', details: { source: 'CSV import' } });
+    }
+    status.textContent = '✅ Imported ' + (data||[]).length + ' lead' + ((data||[]).length !== 1 ? 's' : '') + '!';
+    refresh();
+    renderEventBar();
+    setTimeout(function(){ closeImportModal(); }, 1800);
+  } catch(err) {
+    console.error('Import error:', err);
+    status.textContent = '❌ Import failed: ' + err.message;
+    btn.disabled = false;
+  }
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var imp = document.getElementById('import-modal');
+  if (imp) imp.addEventListener('click', function(e){ if (e.target === imp) closeImportModal(); });
+});
 
 // ── REFRESH & BOOT ────────────────────────────────────────────
 function refresh(){updateKPIs();renderFocus();renderFollowUp();renderPipeline();renderEmailHub();applyFilters();}
