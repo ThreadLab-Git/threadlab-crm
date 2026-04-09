@@ -1,1 +1,4 @@
-{"outputDirectory":"public","cleanUrls":true}
+{
+  "outputDirectory": "public",
+  "cleanUrls": true
+}

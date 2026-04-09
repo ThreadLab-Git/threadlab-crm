@@ -204,7 +204,7 @@ textarea.form-input{resize:vertical;}
 .gmail-msg:hover{border-color:var(--accent)55;}
 .gmail-msg-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;gap:8px;}
 .gmail-msg-from{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
-.gmail-msg-date{font-size:10px;color:var(--text3);white-space:nowraw;flex-shrink:0;}
+.gmail-msg-date{font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
 .gmail-msg-subject{font-size:12px;color:var(--text2);margin-bottom:3px;font-weight:500;}
 .gmail-msg-snippet{font-size:11px;color:var(--text3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gmail-expand{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:12px;margin-top:8px;font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.7;display:none;max-height:240px;overflow-y:auto;}
@@ -224,6 +224,24 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
 .gm-send-btn:hover{background:#7c73ff;}
 .gm-send-btn:disabled{opacity:.5;cursor:not-allowed;}
 .gm-status{font-size:12px;color:var(--text3);}
+/* ── WHATSAPP ────────────────────────────────────────────────── */
+.wa-compose-backdrop{position:fixed;inset:0;background:#00000099;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;}
+.wa-compose-backdrop.open{display:flex;}
+.wa-compose-box{background:var(--bg2);border:1px solid #25d36644;border-radius:16px;width:540px;max-height:90vh;overflow-y:auto;padding:24px;position:relative;box-shadow:0 24px 64px #000000aa;}
+.wa-compose-title{font-size:15px;font-weight:700;color:var(--wa);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.wa-compose-to{font-size:12px;color:var(--text3);margin-bottom:16px;}
+.wa-field{margin-bottom:12px;}
+.wa-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);display:block;margin-bottom:4px;font-weight:600;}
+.wa-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:7px;font-size:13px;width:100%;outline:none;font-family:inherit;}
+.wa-input:focus{border-color:#25d36655;}
+textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
+.wa-char-count{font-size:10px;color:var(--text3);text-align:right;margin-top:3px;}
+.wa-actions{display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap;}
+.wa-send-btn{background:#25d366;border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:6px;}
+.wa-send-btn:hover{background:#1ebe5d;}
+.wa-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.wa-status{font-size:12px;color:var(--text3);}
+/* CSV IMPORT MODAL */
 .import-backdrop{position:fixed;inset:0;background:#00000099;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;}
 .import-backdrop.open{display:flex;}
 .import-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:720px;max-height:92vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 24px 64px #000000aa;}
@@ -251,6 +269,61 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
 .import-btn:hover{background:#7c73ff;}
 .import-btn:disabled{opacity:.5;cursor:not-allowed;}
 .import-status{font-size:12px;color:var(--text3);margin-left:4px;}
+/* SETTINGS */
+#settings-view{max-width:1000px;margin:0 auto;padding:28px;}
+.settings-header{margin-bottom:24px;}
+.settings-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.4px;}
+.settings-sub{font-size:12px;color:var(--text3);margin-top:3px;}
+.settings-tabs{display:flex;gap:6px;margin-bottom:22px;border-bottom:1px solid var(--border);padding-bottom:12px;}
+.stab{border:1px solid transparent;background:none;color:var(--text3);padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.stab:hover{background:var(--bg2);color:var(--text2);}
+.stab.active{background:var(--accent)22;border-color:var(--accent)66;color:var(--accent2);}
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+.settings-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.settings-section-title{font-size:13px;font-weight:700;color:var(--text);}
+.settings-section-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.users-table{width:100%;border-collapse:collapse;}
+.users-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.users-table td{padding:11px 10px;border-bottom:1px solid var(--border)22;font-size:13px;color:var(--text);vertical-align:middle;}
+.users-table tr:last-child td{border-bottom:none;}
+.users-table tr:hover td{background:var(--accent)06;}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent)33;border:1px solid var(--accent)55;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);margin-right:10px;vertical-align:middle;flex-shrink:0;}
+.user-email{font-size:11px;color:var(--text3);margin-top:1px;}
+.role-select{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:4px 8px;border-radius:6px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;}
+.role-select:focus{border-color:var(--accent)88;}
+.status-badge{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.status-active{background:var(--green)22;color:var(--green);border:1px solid var(--green)44;}
+.status-invited{background:var(--yellow)22;color:var(--yellow);border:1px solid var(--yellow)44;}
+.btn-danger{border-color:#f8717155;color:var(--red);background:none;}
+.btn-danger:hover{background:#f8717122;border-color:var(--red);}
+.users-empty{text-align:center;padding:32px;color:var(--text3);font-size:13px;}
+/* INVITE MODAL */
+.invite-backdrop{position:fixed;inset:0;background:#00000088;display:none;align-items:center;justify-content:center;z-index:200;}
+.invite-backdrop.open{display:flex;}
+.invite-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:32px;width:420px;box-shadow:0 24px 64px #00000088;position:relative;}
+.invite-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.invite-sub{font-size:12px;color:var(--text3);margin-bottom:22px;}
+.invite-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.invite-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:600;}
+.invite-field input,.invite-field select{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;outline:none;font-family:inherit;}
+.invite-field input:focus,.invite-field select:focus{border-color:var(--accent)88;}
+.invite-actions{display:flex;gap:8px;margin-top:20px;align-items:center;}
+.invite-status{font-size:12px;margin-left:4px;}
+.role-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.role-admin{background:var(--accent)33;color:var(--accent2);border:1px solid var(--accent)55;}
+.role-editor{background:var(--blue)22;color:var(--blue);border:1px solid var(--blue)44;}
+.role-viewer{background:var(--text3)22;color:var(--text3);border:1px solid var(--border2);}
+/* WA Thread inside lead modal */
+.wa-thread{margin-top:4px;}
+.wa-bubble{padding:9px 13px;border-radius:10px;margin-bottom:6px;max-width:82%;font-size:12px;line-height:1.55;position:relative;}
+.wa-bubble.out{background:#25d36622;border:1px solid #25d36644;color:var(--text);margin-left:auto;border-bottom-right-radius:2px;}
+.wa-bubble.in{background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-right:auto;border-bottom-left-radius:2px;}
+.wa-bubble-meta{font-size:10px;color:var(--text3);margin-top:4px;display:flex;justify-content:space-between;gap:8px;}
+.wa-bubble-dir{font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.wa-bubble.out .wa-bubble-dir{color:#25d366;}
+.wa-bubble.in .wa-bubble-dir{color:var(--accent2);}
+.wa-thread-empty{font-size:12px;color:var(--text3);padding:12px 0;text-align:center;}
+.wa-thread-loading{font-size:12px;color:var(--text3);padding:8px 0;}
 </style>
 </head>
 <body>
@@ -262,7 +335,7 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
     <div class="login-sub">Expo Lead Tracker — sign in to continue</div>
     <div class="login-field">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="daniel@threadlab.com.au" autocomplete="email">
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
     </div>
     <div class="login-field">
       <label>Password</label>
@@ -270,6 +343,26 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="login-error"></div>
+    <div style="text-align:center;margin-top:14px;">
+      <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;">Forgot password?</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD SCREEN -->
+<div id="forgot-screen" style="position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:999;">
+  <div class="login-box">
+    <div class="login-logo">Reset Password</div>
+    <div class="login-sub">Enter your email and we'll send you a reset link</div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="reset-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <button class="login-btn" id="reset-btn" onclick="doResetPassword()">Send Reset Link</button>
+    <div class="login-error" id="reset-msg" style="color:var(--text3)"></div>
+    <div style="text-align:center;margin-top:14px;">
+      <button onclick="hideForgotPassword()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;">← Back to sign in</button>
+    </div>
   </div>
 </div>
 
@@ -286,6 +379,7 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
     <button class="btn" onclick="openImportModal()">↑ Import CSV</button>
     <button class="btn" onclick="exportCSV()">↓ Export CSV</button>
     <button class="btn btn-gmail" id="gmail-btn" onclick="connectGmail()" title="Connect Gmail to send emails and view threads">📧 Connect Gmail</button>
+    <button class="btn" id="settings-btn" onclick="showSettings()" style="display:none">⚙ Settings</button>
     <button class="btn btn-logout" onclick="doLogout()">Sign Out</button>
   </div>
 </header>
@@ -397,6 +491,73 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
   </div>
 </div>
 
+<!-- SETTINGS VIEW -->
+<div id="settings-view" style="display:none">
+  <div id="settings-view-inner">
+    <div class="settings-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="settings-title">Settings</div>
+        <div class="settings-sub">Manage your team and workspace</div>
+      </div>
+      <button class="btn" onclick="hideSettings()" style="margin-top:2px">← Back to Dashboard</button>
+    </div>
+    <div class="settings-tabs">
+      <button class="stab active" onclick="switchSettingsTab('team')">👥 Team</button>
+    </div>
+    <div id="settings-tab-team">
+      <div class="settings-section">
+        <div class="settings-section-hdr">
+          <div>
+            <div class="settings-section-title">Team Members</div>
+            <div class="settings-section-sub">Invite people and manage their access level</div>
+          </div>
+          <button class="btn btn-primary" onclick="openInviteModal()">+ Invite User</button>
+        </div>
+        <table class="users-table">
+          <thead><tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="users-tbody"><tr><td colspan="5" class="users-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE USER MODAL -->
+<div class="invite-backdrop" id="invite-modal">
+  <div class="invite-box">
+    <button class="modal-close" onclick="closeInviteModal()">✕</button>
+    <div class="invite-title">Invite Team Member</div>
+    <div class="invite-sub">They'll receive an email to set up their account</div>
+    <div class="invite-field">
+      <label>Email Address</label>
+      <input type="email" id="invite-email" placeholder="colleague@company.com">
+    </div>
+    <div class="invite-field">
+      <label>Full Name (optional)</label>
+      <input type="text" id="invite-name" placeholder="Jane Smith">
+    </div>
+    <div class="invite-field">
+      <label>Permission Level</label>
+      <select id="invite-role">
+        <option value="editor">Editor — can view and edit all leads</option>
+        <option value="viewer">Viewer — read-only access to leads</option>
+        <option value="admin">Admin — full access + manage team</option>
+      </select>
+    </div>
+    <div class="invite-actions">
+      <button class="btn btn-primary" id="invite-btn" onclick="doInviteUser()">Send Invite</button>
+      <button class="btn" onclick="closeInviteModal()">Cancel</button>
+      <span class="invite-status" id="invite-status"></span>
+    </div>
+  </div>
+</div>
+
 <!-- LEAD DETAIL MODAL -->
 <div class="modal-backdrop" id="lead-modal">
   <div class="modal">
@@ -459,6 +620,13 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
       <div class="modal-section" id="gmail-section" style="display:none">
         <div class="modal-section-title" style="color:#ea4335">📬 Gmail Thread <span id="gmail-thread-lbl" style="font-size:9px;font-weight:400;text-transform:none;color:var(--text3);margin-left:4px;"></span></div>
         <div id="gmail-thread"></div>
+      </div>
+      <div class="modal-section" id="wa-thread-section" style="display:none">
+        <div class="modal-section-title" style="color:var(--wa);display:flex;align-items:center;justify-content:space-between;">
+          <span>💬 WhatsApp Thread</span>
+          <button onclick="openWACompose()" style="background:#25d36622;border:1px solid #25d36655;color:var(--wa);padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">+ Send Message</button>
+        </div>
+        <div class="wa-thread" id="wa-thread-messages"></div>
       </div>
       <div class="modal-section">
         <div class="modal-section-title">💡 Suggested Next Steps</div>
@@ -558,6 +726,25 @@ textarea.gm-input{min-height:160px;resize:vertical;line-height:1.65;}
   </div>
 </div>
 
+<!-- WHATSAPP COMPOSE MODAL -->
+<div class="wa-compose-backdrop" id="wa-compose-modal">
+  <div class="wa-compose-box">
+    <button class="modal-close" onclick="closeWACompose()">✕</button>
+    <div class="wa-compose-title">💬 Send WhatsApp</div>
+    <div class="wa-compose-to" id="wa-compose-to"></div>
+    <div class="wa-field">
+      <label>Message</label>
+      <textarea class="wa-input" id="wa-compose-body" oninput="updateWACharCount()" placeholder="Type your message..."></textarea>
+      <div class="wa-char-count" id="wa-char-count">0 / 1600</div>
+    </div>
+    <div class="wa-actions">
+      <button class="wa-send-btn" id="wa-send-btn" onclick="sendWAMessage()">📤 Send via WhatsApp</button>
+      <button class="btn" onclick="closeWACompose()">Cancel</button>
+      <span class="wa-status" id="wa-send-status"></span>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────
 var SUPABASE_URL = 'https://jmplldpbabownxecoaaq.supabase.co';
@@ -581,10 +768,13 @@ async function doLogin() {
   } else {
     showApp();
     loadFromStorage();
+    loadUserProfile();
   }
 }
 async function doLogout() {
   await sb.auth.signOut();
+  currentUserProfile = null;
+  hideSettings();
   document.getElementById('main-app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('login-password').value = '';
@@ -598,6 +788,42 @@ function showApp() {
   applyTheme(localStorage.getItem('tl-theme') === 'light');
 }
 document.getElementById('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
+function showForgotPassword() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('reset-email').value = document.getElementById('login-email').value;
+  document.getElementById('reset-msg').textContent = '';
+  document.getElementById('reset-btn').textContent = 'Send Reset Link';
+  document.getElementById('reset-btn').disabled = false;
+  document.getElementById('forgot-screen').style.display = 'flex';
+  setTimeout(function() { document.getElementById('reset-email').focus(); }, 50);
+}
+function hideForgotPassword() {
+  document.getElementById('forgot-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+async function doResetPassword() {
+  var email = document.getElementById('reset-email').value.trim();
+  var msg = document.getElementById('reset-msg');
+  var btn = document.getElementById('reset-btn');
+  if (!email) { msg.style.color = 'var(--red)'; msg.textContent = 'Please enter your email.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  msg.textContent = '';
+  var redirectTo = window.location.origin + window.location.pathname;
+  var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: redirectTo });
+  if (r.error) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = r.error.message;
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Link';
+  } else {
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ Check your inbox — reset link sent to ' + email;
+    btn.textContent = 'Sent!';
+  }
+}
+document.getElementById('reset-email').addEventListener('keydown', function(e) { if (e.key === 'Enter') doResetPassword(); });
 
 // ── ROW MAPPING ───────────────────────────────────────────────
 function mapRow(row) {
@@ -790,7 +1016,7 @@ function renderPipeline(){
 // ── CHARTS ────────────────────────────────────────────────────
 function buildCharts(){var fc=filteredContacts();buildDonut('chartSize',['Enterprise','Large','Medium','Small','Startup'],['#a89cff','#34d399','#60a5fa','#fbbf24','#f472b6'],function(s){return fc.filter(function(c){return c.size===s;}).length;});buildDonut('chartPrio',['Big Fish','Hot','Warm','Cold'],['#f87171','#fb923c','#60a5fa','#6b7280'],function(p){return fc.filter(function(c){return c.priority===p;}).length;});buildDonut('chartContact',['Email','WhatsApp','Phone','Unknown'],['#4ade80','#34d399','#60a5fa','#9ca3af'],function(m){return fc.filter(function(c){return c.preferredContact===m;}).length;});buildHBar('chartInterests',topCounts(fc,function(c){return c.interests||[];},8));buildHBar('chartGeo',topCounts(fc,function(c){return[(c.location||'Unknown').split(',')[0].trim().split('/')[0].trim()];},8));buildStackedBar('chartMatrix',fc);}
 function buildDonut(id,labels,colors,fn){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;chartInstances[id]=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:labels.map(fn),backgroundColor:colors,borderColor:'transparent',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a9aba',font:{size:10},boxWidth:10,padding:8}}}}});}
-function buildHBar(id,data){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;chartInstances[id]=new Chart(ctx,{type:'bar',data:{labels:data.labels,datasets:[{data:data.values,backgroundColor:'#6c63ff88',borderColor:'#6c63ff',borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#c8c8e8',font:{size:9}},grid:{color:'#2a2a4a22'},beginAtZero:true},y:{ticks:{color:'#c8c8e8',font:{size:10}},grid:{display:false}}}}});}
+function buildHBar(id,data){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;chartInstances[id]=new Chart(ctx,{type:'bar',data:{labels:data.labels,datasets:[{data:data.values,backgroundColor:'#6c63ff88',borderColor:'#6c63ff',borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7a7a9a',font:{size:9}},grid:{color:'#2a2a4a22'},beginAtZero:true},y:{ticks:{color:'#c8c8e8',font:{size:10}},grid:{display:false}}}}});}
 function buildStackedBar(id,fc){if(chartInstances[id])chartInstances[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;var sizes=['Enterprise','Large','Medium','Small','Startup'];var prios=['Big Fish','Hot','Warm','Cold'];var colors={'Big Fish':'#f87171',Hot:'#fb923c',Warm:'#60a5fa',Cold:'#6b7280'};chartInstances[id]=new Chart(ctx,{type:'bar',data:{labels:sizes,datasets:prios.map(function(p){return{label:p,data:sizes.map(function(s){return fc.filter(function(c){return c.size===s&&c.priority===p;}).length;}),backgroundColor:colors[p],borderRadius:2};})},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a9aba',font:{size:10},boxWidth:10}}},scales:{x:{stacked:true,ticks:{color:'#9a9aba',font:{size:10}},grid:{color:'#2a2a4a22'}},y:{stacked:true,ticks:{color:'#9a9aba',font:{size:9}},grid:{color:'#2a2a4a22'},beginAtZero:true}}}});}
 function topCounts(fc,keyFn,n){var counts={};fc.forEach(function(c){keyFn(c).forEach(function(k){counts[k]=(counts[k]||0)+1;});});var sorted=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).slice(0,n);return{labels:sorted,values:sorted.map(function(k){return counts[k];})};}
 
@@ -805,8 +1031,91 @@ function openInEmailClient(){var e=currentEmailContact&&currentEmailContact.emai
 function copyEmailToClipboard(){navigator.clipboard.writeText('Subject: '+document.getElementById('email-subject').value+'\n\n'+document.getElementById('email-body').value).then(function(){var b=document.querySelector('.btn-copy-email');b.textContent='Copied!';setTimeout(function(){b.textContent='📋 Copy Email';},2000);});}
 
 // ── WHATSAPP ──────────────────────────────────────────────────
-function getWAMsg(c){var fn=c.name.split(' ')[0];var int=(c.interests||[]).slice(0,2).join(' and ');var st=c.stage||'New';var m={'New':'Hi '+fn+'! Great meeting you at '+(c.event||'the show')+'. I\'m Daniel from Threadlab — we spoke about '+int+'. Would love to follow up!','Reached Out':'Hi '+fn+', Daniel from Threadlab. Just following up on my message about '+int+'. Even a quick reply works!','Pending Reply':'Hi '+fn+', thanks for getting back to me! Shall we jump on a quick call or I can send more info?','Proposal Sent':'Hi '+fn+', Daniel from Threadlab. Just checking in on the proposal — happy to adjust anything around '+int+'.','In Discussion':'Hi '+fn+', following up on our conversation about '+int+'. Let me know if anything has changed.','Won':'Hi '+fn+'! So excited to have '+c.company+' on board. Our team will be in touch shortly!','Dropped':'Hi '+fn+', Daniel from Threadlab. Hope you\'re well — we\'ve had some exciting updates that might suit '+c.company+'.'};return m[st]||m['New'];}
-function openWhatsApp(){if(!currentEmailContact||!currentEmailContact.phone)return;window.open('https://wa.me/'+currentEmailContact.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(getWAMsg(currentEmailContact)),'_blank');}
+function getWAMsg(c){var fn=c.name.split(' ')[0];var int=(c.interests||[]).slice(0,2).join(' and ');var st=c.stage||'New';var m={'New':'Hi '+fn+'! Great meeting you at '+(c.event||'the show')+'. I\'m Daniel from Threadlab — we spoke about '+int+'. Would love to follow up! 🙌','Reached Out':'Hi '+fn+', Daniel from Threadlab here. Just following up on my message about '+int+'. Even a quick reply works!','Pending Reply':'Hi '+fn+', thanks for getting back to me! Shall we jump on a quick call or I can send more info?','Proposal Sent':'Hi '+fn+', Daniel from Threadlab. Just checking in on the proposal — happy to adjust anything around '+int+'.','In Discussion':'Hi '+fn+', following up on our conversation about '+int+'. Let me know if anything has changed.','Won':'Hi '+fn+'! So excited to have '+c.company+' on board. Our team will be in touch shortly!','Dropped':'Hi '+fn+', Daniel from Threadlab. Hope you\'re well — we\'ve had some exciting updates that might suit '+c.company+'.'};return m[st]||m['New'];}
+
+// Open the WA compose modal (replaces the old wa.me link)
+function openWhatsApp(){
+  if(!currentEmailContact||!currentEmailContact.phone)return;
+  openWACompose();
+}
+
+// Open the WA compose modal for the current lead
+function openWACompose(){
+  var c=currentModalContact||currentEmailContact;
+  if(!c||!c.phone){alert('This lead has no phone number saved.');return;}
+  document.getElementById('wa-compose-to').textContent='To: '+c.name+' ('+c.phone+')';
+  var body=document.getElementById('wa-compose-body');
+  body.value=getWAMsg(c);
+  updateWACharCount();
+  document.getElementById('wa-send-status').textContent='';
+  document.getElementById('wa-send-btn').disabled=false;
+  document.getElementById('wa-compose-modal').classList.add('open');
+  setTimeout(function(){body.focus();body.setSelectionRange(body.value.length,body.value.length);},80);
+}
+function closeWACompose(){document.getElementById('wa-compose-modal').classList.remove('open');}
+function updateWACharCount(){var v=document.getElementById('wa-compose-body').value;document.getElementById('wa-char-count').textContent=v.length+' / 1600';}
+
+// Send the message via the backend → Twilio
+async function sendWAMessage(){
+  var c=currentModalContact||currentEmailContact;
+  if(!c)return;
+  var body=document.getElementById('wa-compose-body').value.trim();
+  if(!body){alert('Message cannot be empty.');return;}
+  var btn=document.getElementById('wa-send-btn');
+  var status=document.getElementById('wa-send-status');
+  btn.disabled=true;btn.textContent='Sending…';status.textContent='';
+  try{
+    var resp=await fetch('/api/whatsapp/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lead_id:c.id,lead_name:c.name,to_number:c.phone,body:body})
+    });
+    var json=await resp.json();
+    if(!resp.ok)throw new Error(json.error||'Send failed');
+    status.style.color='var(--green)';status.textContent='✓ Sent!';
+    btn.textContent='📤 Send via WhatsApp';
+    setTimeout(function(){closeWACompose();loadWAMessages(c);},900);
+  }catch(err){
+    console.error('WA send error:',err);
+    status.style.color='var(--red)';status.textContent='Error: '+err.message;
+    btn.disabled=false;btn.textContent='📤 Send via WhatsApp';
+  }
+}
+
+// Load and render the WA thread for a lead
+async function loadWAMessages(c){
+  if(!c||!c.phone)return;
+  var section=document.getElementById('wa-thread-section');
+  var container=document.getElementById('wa-thread-messages');
+  section.style.display='block';
+  container.innerHTML='<div class="wa-thread-loading">⏳ Loading messages…</div>';
+  try{
+    var resp=await fetch('/api/whatsapp/messages/'+encodeURIComponent(c.id));
+    if(!resp.ok)throw new Error('Failed to load messages');
+    var msgs=await resp.json();
+    if(!msgs.length){
+      container.innerHTML='<div class="wa-thread-empty">No WhatsApp messages yet. Hit "Send Message" to start the conversation.</div>';
+      return;
+    }
+    container.innerHTML=msgs.map(function(m){
+      var isOut=m.direction==='outbound';
+      var cls=isOut?'out':'in';
+      var dir=isOut?'You':'Lead';
+      var time=new Date(m.created_at).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+      return '<div class="wa-bubble '+cls+'">'+
+        escHtml(m.body)+
+        '<div class="wa-bubble-meta"><span class="wa-bubble-dir">'+dir+'</span><span>'+time+'</span></div>'+
+      '</div>';
+    }).join('');
+    // Scroll to bottom
+    container.scrollTop=container.scrollHeight;
+  }catch(err){
+    console.error('WA load error:',err);
+    container.innerHTML='<div class="wa-thread-empty" style="color:var(--red)">Could not load messages: '+escHtml(err.message)+'</div>';
+  }
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ── NEXT STEPS ────────────────────────────────────────────────
 function getNextSteps(c){var st=c.stage||'New';var m={'New':['Send initial outreach referencing your meeting at '+(c.event||'the show'),'Connect on LinkedIn to warm up the relationship',c.preferredContact==='WhatsApp'?'Send a WhatsApp — this is their preferred channel':null,'Share the Threadlab lookbook / catalogue'],'Reached Out':['Follow up if no response in 3-5 days','Try a different channel: '+(c.phone?'phone/WhatsApp at '+c.phone:'LinkedIn'),'Share a relevant case study or product image'],'Pending Reply':['They replied — respond within 24 hours','Address their questions','Propose a call to move forward faster'],'Proposal Sent':['Follow up if no response in 5-7 days','Offer to adjust pricing or MOQs','Suggest a call to walk through the proposal'],'In Discussion':['Confirm agreed next steps in writing','Prepare sample order or invoice','Check in every 3-4 days','Get a commitment on timeline and first order size'],'Won':['Send formal invoice and order confirmation','Introduce them to the Threadlab production team','Ask for a referral after delivery'],'Dropped':['Re-engage after 4-6 weeks with fresh context','Share something new (product launch, price update)','Keep on quarterly newsletter list']};return(m[st]||m['New']).filter(Boolean);}
@@ -829,6 +1138,9 @@ function openModal(name){
   var gmailConnected = gmailAccessToken && Date.now() < gmailTokenExpiry;
   document.getElementById('btn-send-gmail').style.display = gmailConnected ? 'inline-flex' : 'none';
   if (gmailConnected) { loadGmailThread(c); } else { var gs=document.getElementById('gmail-section'); if(gs) gs.style.display='none'; }
+  // WhatsApp: show thread section if lead has a phone number
+  var waSect=document.getElementById('wa-thread-section');
+  if(c.phone){ waSect.style.display='block'; loadWAMessages(c); } else { waSect.style.display='none'; }
   document.getElementById('lead-modal').classList.add('open');
 }
 function closeModal(){document.getElementById('lead-modal').classList.remove('open');currentModalContact=null;refresh();}
@@ -863,6 +1175,7 @@ function renderTable(rows){var html='';if(!rows.length){html='<tr><td colspan="9
 document.addEventListener('click',function(e){var btn=e.target.closest('.fb');if(!btn)return;var f=btn.dataset.f,v=btn.dataset.v;if(!f||!v)return;currentFilters[f]=v;document.querySelectorAll("[data-f='"+f+"']").forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});applyFilters();});
 document.getElementById('lead-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('form-modal').addEventListener('click',function(e){if(e.target===this)closeFormModal();});
+document.getElementById('wa-compose-modal').addEventListener('click',function(e){if(e.target===this)closeWACompose();});
 
 // ── EXPORT CSV ────────────────────────────────────────────────
 function exportCSV(){var headers=['Name','Company','Email','Phone','Type','Size','Priority','Contact','Location','Event','Score','Stage','Interests','Notes'];var rows=filteredContacts().map(function(c){return[c.name,c.company,c.email,c.phone,c.type,c.size,c.priority,c.preferredContact,c.location,c.event||'',c.score,c.stage||'New',(c.interests||[]).join('; '),(c.notes||'').replace(/,/g,';')].map(function(v){return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');});var blob=new Blob([[headers.join(',')].concat(rows).join('\n')],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='threadlab-leads.csv';a.click();}
@@ -1029,12 +1342,12 @@ function refresh(){updateKPIs();renderFocus();renderFollowUp();renderPipeline();
 
 window.addEventListener('DOMContentLoaded', async function() {
   var r = await sb.auth.getSession();
-  if (r.data && r.data.session) { showApp(); loadFromStorage(); }
+  if (r.data && r.data.session) { showApp(); loadFromStorage(); loadUserProfile(); }
   tryInitGmail();
 });
 
 // ── GMAIL INTEGRATION ─────────────────────────────────────────
-var GOOGLE_CLIENT_ID = '792806439973-btnc6rfjbtea1c0dheclkhdi2vsc06g4.apps.googleusercontent.com'; // ← Replace with your OAuth 2.0 Client ID
+var GOOGLE_CLIENT_ID = '792806439973-btnc6rfjbtea1c0dheclkhdi2vsc06g4.apps.googleusercontent.com';
 var gmailTokenClient = null;
 var gmailAccessToken = null;
 var gmailTokenExpiry = 0;
@@ -1352,6 +1665,195 @@ async function sendViaGmail() {
 // Close compose on backdrop click
 document.getElementById('gm-compose-modal').addEventListener('click', function(e) {
   if (e.target === this) closeGmailCompose();
+});
+
+// ── USER PROFILE & SETTINGS ───────────────────────────────────
+var currentUserProfile = null;
+
+async function getAuthToken() {
+  var r = await sb.auth.getSession();
+  return r.data && r.data.session ? r.data.session.access_token : null;
+}
+
+async function loadUserProfile() {
+  var token = await getAuthToken();
+  if (!token) return;
+  try {
+    var r = await fetch('/api/users/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!r.ok) return;
+    currentUserProfile = await r.json();
+    // Show Settings button for admins only
+    var settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) settingsBtn.style.display = currentUserProfile.role === 'admin' ? '' : 'none';
+    // Restrict UI for viewers
+    if (currentUserProfile.role === 'viewer') applyViewerRestrictions();
+  } catch(e) {
+    console.error('Failed to load user profile:', e);
+  }
+}
+
+function applyViewerRestrictions() {
+  ['btn-primary', 'btn'].forEach(function(cls) {});
+  // Hide write-action buttons for viewers
+  document.querySelectorAll('.btn-primary, [onclick="openAddModal()"], [onclick="openImportModal()"]')
+    .forEach(function(el) {
+      if (el.textContent.includes('Add Lead') || el.textContent.includes('Import')) {
+        el.style.display = 'none';
+      }
+    });
+}
+
+function showSettings() {
+  document.querySelector('.event-bar') && (document.querySelector('.event-bar').style.display = 'none');
+  document.querySelector('.container') && (document.querySelector('.container').style.display = 'none');
+  document.getElementById('settings-view').style.display = 'block';
+  loadUsers();
+}
+
+function hideSettings() {
+  document.getElementById('settings-view').style.display = 'none';
+  document.querySelector('.event-bar') && (document.querySelector('.event-bar').style.display = '');
+  document.querySelector('.container') && (document.querySelector('.container').style.display = '');
+}
+
+function switchSettingsTab(tab) {
+  document.querySelectorAll('.stab').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('.stab[onclick*="' + tab + '"]').classList.add('active');
+  document.querySelectorAll('[id^="settings-tab-"]').forEach(function(el) { el.style.display = 'none'; });
+  document.getElementById('settings-tab-' + tab).style.display = '';
+}
+
+async function loadUsers() {
+  var tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="users-empty">Loading…</td></tr>';
+  var token = await getAuthToken();
+  if (!token) return;
+  try {
+    var r = await fetch('/api/users', { headers: { 'Authorization': 'Bearer ' + token } });
+    var users = await r.json();
+    if (!r.ok) throw new Error(users.error || 'Failed to load users');
+    renderUsersTable(users);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" class="users-empty" style="color:var(--red)">Error: ' + e.message + '</td></tr>';
+  }
+}
+
+function renderUsersTable(users) {
+  var tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="users-empty">No team members yet — invite someone above.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(function(u) {
+    var initials = (u.full_name || u.email).split(/\s|@/)[0].slice(0, 2).toUpperCase();
+    var isMe = currentUserProfile && u.id === currentUserProfile.id;
+    var joined = u.created_at ? new Date(u.created_at).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    var roleOptions = ['admin','editor','viewer'].map(function(r) {
+      return '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r.charAt(0).toUpperCase() + r.slice(1) + '</option>';
+    }).join('');
+    var roleCtrl = isMe
+      ? '<span class="role-pill role-' + u.role + '">' + u.role + '</span>'
+      : '<select class="role-select" onchange="updateUserRole(\'' + u.id + '\', this.value)" ' + (isMe ? 'disabled' : '') + '>' + roleOptions + '</select>';
+    var deleteBtn = isMe
+      ? '<span style="font-size:11px;color:var(--text3)">You</span>'
+      : '<button class="btn btn-danger" style="padding:5px 10px;font-size:11px;" onclick="removeUser(\'' + u.id + '\',\'' + esc(u.email) + '\')">Remove</button>';
+    return '<tr>'
+      + '<td><span class="user-avatar">' + initials + '</span>'
+      + '<span><div style="font-weight:600">' + (u.full_name || '—') + '</div><div class="user-email">' + u.email + '</div></span></td>'
+      + '<td>' + roleCtrl + '</td>'
+      + '<td><span class="status-badge status-' + u.status + '">' + u.status + '</span></td>'
+      + '<td style="color:var(--text3);font-size:12px">' + joined + '</td>'
+      + '<td style="text-align:right">' + deleteBtn + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+async function updateUserRole(id, role) {
+  var token = await getAuthToken();
+  try {
+    var r = await fetch('/api/users/' + id + '/role', {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: role })
+    });
+    var data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Failed to update role');
+  } catch(e) {
+    alert('Error: ' + e.message);
+    loadUsers(); // revert display
+  }
+}
+
+async function removeUser(id, email) {
+  if (!confirm('Remove ' + email + '? This cannot be undone.')) return;
+  var token = await getAuthToken();
+  try {
+    var r = await fetch('/api/users/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Failed to remove user');
+    loadUsers();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function openInviteModal() {
+  document.getElementById('invite-email').value = '';
+  document.getElementById('invite-name').value = '';
+  document.getElementById('invite-role').value = 'editor';
+  document.getElementById('invite-status').textContent = '';
+  document.getElementById('invite-btn').disabled = false;
+  document.getElementById('invite-btn').textContent = 'Send Invite';
+  document.getElementById('invite-modal').classList.add('open');
+  setTimeout(function() { document.getElementById('invite-email').focus(); }, 50);
+}
+
+function closeInviteModal() {
+  document.getElementById('invite-modal').classList.remove('open');
+}
+
+async function doInviteUser() {
+  var email = document.getElementById('invite-email').value.trim();
+  var name = document.getElementById('invite-name').value.trim();
+  var role = document.getElementById('invite-role').value;
+  var status = document.getElementById('invite-status');
+  var btn = document.getElementById('invite-btn');
+
+  if (!email) { status.textContent = '⚠ Email is required'; status.style.color = 'var(--red)'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  status.textContent = '';
+
+  var token = await getAuthToken();
+  try {
+    var r = await fetch('/api/users/invite', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, full_name: name, role: role })
+    });
+    var data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Failed to send invite');
+    status.style.color = 'var(--green)';
+    status.textContent = '✓ Invite sent to ' + email;
+    btn.textContent = 'Sent!';
+    loadUsers();
+    setTimeout(closeInviteModal, 1800);
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = '⚠ ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Send Invite';
+  }
+}
+
+document.getElementById('invite-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeInviteModal();
 });
 </script>
 </body>
