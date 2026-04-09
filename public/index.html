@@ -269,6 +269,12 @@ textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
 .import-btn:hover{background:#7c73ff;}
 .import-btn:disabled{opacity:.5;cursor:not-allowed;}
 .import-status{font-size:12px;color:var(--text3);margin-left:4px;}
+/* ASSIGNEE BAR */
+.assignee-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 28px;display:flex;align-items:center;gap:6px;overflow-x:auto;flex-wrap:nowrap;}
+.assignee-tab{border:1px solid var(--border2);background:var(--bg3);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
+.assignee-tab:hover{border-color:var(--teal)55;color:var(--teal);}
+.assignee-tab.active{background:var(--teal)22;border-color:var(--teal);color:var(--teal);}
+.assignee-avatar{width:16px;height:16px;border-radius:50%;background:var(--teal)33;border:1px solid var(--teal)55;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--teal);}
 /* SETTINGS */
 #settings-view{max-width:1000px;margin:0 auto;padding:28px;}
 .settings-header{margin-bottom:24px;}
@@ -384,6 +390,7 @@ textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
   </div>
 </header>
 <div class="event-bar" id="event-bar"></div>
+<div class="assignee-bar" id="assignee-bar" style="display:none"></div>
 <div class="container">
   <div class="notice">
     <span>🗄️ <b>Supabase backend active</b> — all data stored in Postgres, persists across sessions.</span>
@@ -484,9 +491,9 @@ textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
         <th onclick="sortBy('size')">Size ↕</th>
         <th onclick="sortBy('score')">Score ↕</th>
         <th onclick="sortBy('priority')">Priority ↕</th>
-        <th>Stage</th><th>Notes</th>
+        <th>Stage</th><th>Assigned To</th><th>Notes</th>
       </tr></thead>
-      <tbody id="contacts-tbody"><tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">Loading...</td></tr></tbody>
+      <tbody id="contacts-tbody"><tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text3)">Loading...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -576,6 +583,14 @@ textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
         <div class="info-item"><label>Location</label><div class="val" id="m-location"></div></div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          Assigned To
+          <select class="role-select" id="m-assigned-select" onchange="saveAssignedTo()" style="min-width:160px;">
+            <option value="">— Unassigned —</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Pipeline Stage</div>
         <select class="stage-select" id="m-stage-select" onchange="saveStage()">
           <option value="New">📄 New</option>
@@ -657,6 +672,7 @@ textarea.wa-input{min-height:120px;resize:vertical;line-height:1.65;}
           <div class="event-suggestions" id="event-suggestions"></div>
         </div>
       </div>
+      <div class="form-group"><label>Assigned To</label><select class="form-input" id="f-assigned"><option value="">— Unassigned —</option></select></div>
       <div class="form-group full"><label>Interests (comma separated)</label><input class="form-input" id="f-interests" placeholder="Custom, Blanks, Volume"></div>
       <div class="form-group full"><label>Notes</label><textarea class="form-input" id="f-notes" rows="3" placeholder="Notes from the show..."></textarea></div>
     </div>
@@ -769,6 +785,7 @@ async function doLogin() {
     showApp();
     loadFromStorage();
     loadUserProfile();
+    loadTeamUsers();
   }
 }
 async function doLogout() {
@@ -835,7 +852,8 @@ function mapRow(row) {
     location: row.location || '', event: row.event_name || '',
     interests: row.interests || [], notes: row.notes || '',
     score: row.score || 0, stage: row.stage || 'New',
-    pendingSince: row.pending_since || null, personalNote: row.personal_note || ''
+    pendingSince: row.pending_since || null, personalNote: row.personal_note || '',
+    assignedTo: row.assigned_to || null
   };
 }
 function toDbRow(obj) {
@@ -844,7 +862,8 @@ function toDbRow(obj) {
     type: obj.type || 'Brand', size: obj.size || 'Medium', priority: obj.priority || 'Warm',
     preferred_contact: obj.preferredContact || 'Email', location: obj.location || '',
     event_name: obj.event || '', interests: obj.interests || [],
-    notes: obj.notes || '', score: obj.score || 0
+    notes: obj.notes || '', score: obj.score || 0,
+    assigned_to: obj.assignedTo || null
   };
 }
 
@@ -962,7 +981,12 @@ function sizeBadge(s){var m={Enterprise:'size-ent',Large:'size-large',Medium:'si
 function stageBadge(st){return'<span class="badge '+(STAGE_CSS[st]||'stage-new')+'">'+st+'</span>';}
 function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 function getEvents(){var ev={};contacts.forEach(function(c){if(c.event)ev[c.event]=true;});return Object.keys(ev).sort();}
-function filteredContacts(){if(currentEvent==='All')return contacts;return contacts.filter(function(c){return c.event===currentEvent;});}
+function filteredContacts(){
+  var base=currentEvent==='All'?contacts:contacts.filter(function(c){return c.event===currentEvent;});
+  if(currentAssigneeFilter==='All')return base;
+  if(currentAssigneeFilter==='none')return base.filter(function(c){return !c.assignedTo;});
+  return base.filter(function(c){return c.assignedTo===currentAssigneeFilter;});
+}
 
 // ── EVENT BAR ─────────────────────────────────────────────────
 function renderEventBar(){
@@ -1130,6 +1154,7 @@ function openModal(name){
   var ci='';if(c.email)ci+='<a href="mailto:'+c.email+'">'+c.email+'</a> <button class="copy-btn" onclick="navigator.clipboard.writeText(\''+c.email+'\')">Copy</button>';if(c.phone)ci+=(ci?'<br>':'')+c.phone+' <button class="copy-btn" onclick="navigator.clipboard.writeText(\''+c.phone+'\')">Copy</button>';if(!ci)ci='<span style="color:var(--text3)">No contact info captured</span>';
   document.getElementById('m-contact').innerHTML=ci;document.getElementById('m-location').textContent=c.location||'Unknown';
   document.getElementById('m-stage-select').value=c.stage||'New';
+  var assignSel=document.getElementById('m-assigned-select');if(assignSel)assignSel.value=c.assignedTo||'';
   document.getElementById('m-interests').innerHTML=(c.interests||[]).map(function(i){return'<span class="tag-interest">'+i+'</span>';}).join('');
   document.getElementById('m-notes').textContent=c.notes||'No notes recorded.';document.getElementById('m-personal-notes').value=c.personalNote||'';
   document.getElementById('btn-whatsapp').style.display=c.phone?'inline-flex':'none';
@@ -1171,7 +1196,7 @@ async function saveFormLead(){
 function filterByStage(st){if(currentStageFilter===st){currentStageFilter=null;currentFilters.stage='All';}else{currentStageFilter=st;currentFilters.stage=st;}document.querySelectorAll("[data-f='stage']").forEach(function(b){b.classList.toggle('on',b.dataset.v===(currentStageFilter||'All'));});renderPipeline();applyFilters();}
 function sortBy(f){if(currentSort.field===f)currentSort.dir*=-1;else{currentSort.field=f;currentSort.dir=-1;}applyFilters();}
 function applyFilters(){var search=(document.getElementById('search-input').value||'').toLowerCase();var fc=filteredContacts();var rows=fc.filter(function(c){if(currentFilters.priority!=='All'&&c.priority!==currentFilters.priority)return false;if(currentFilters.size!=='All'&&c.size!==currentFilters.size)return false;if(currentFilters.stage!=='All'&&(c.stage||'New')!==currentFilters.stage)return false;if(search){var h=(c.name+' '+c.company+' '+(c.interests||[]).join(' ')+' '+(c.notes||'')).toLowerCase();if(h.indexOf(search)===-1)return false;}return true;});rows.sort(function(a,b){var av=a[currentSort.field],bv=b[currentSort.field];if(typeof av==='string')av=av.toLowerCase();if(typeof bv==='string')bv=bv.toLowerCase();return av<bv?-currentSort.dir:av>bv?currentSort.dir:0;});document.getElementById('table-count').textContent=rows.length+' of '+fc.length+' leads';renderTable(rows);}
-function renderTable(rows){var html='';if(!rows.length){html='<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">No contacts match your filters</td></tr>';}else{rows.forEach(function(c){var st=c.stage||'New';var ci=c.email?'<a href="mailto:'+c.email+'" style="color:var(--blue)">'+c.email+'</a>':(c.phone?'<span style="color:var(--text2)">'+c.phone+'</span>':'<span style="color:var(--text3)">—</span>');html+='<tr onclick="openModal(\''+esc(c.name)+'\')"><td style="font-weight:600;color:var(--text)">'+c.name+'</td><td style="color:var(--text2)">'+c.company+'</td><td>'+ci+'</td><td><span class="event-badge" style="font-size:9px">'+(c.event||'—')+'</span></td><td>'+sizeBadge(c.size)+'</td><td><span class="score-pill" style="background:'+scoreColor(c.score)+'">'+c.score+'</span></td><td>'+prioBadge(c.priority)+'</td><td>'+stageBadge(st)+'</td><td style="color:var(--text3);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(c.notes||'').substring(0,55)+((c.notes||'').length>55?'…':'')+'</td></tr>';});}document.getElementById('contacts-tbody').innerHTML=html;}
+function renderTable(rows){var html='';if(!rows.length){html='<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text3)">No contacts match your filters</td></tr>';}else{rows.forEach(function(c){var st=c.stage||'New';var ci=c.email?'<a href="mailto:'+c.email+'" style="color:var(--blue)">'+c.email+'</a>':(c.phone?'<span style="color:var(--text2)">'+c.phone+'</span>':'<span style="color:var(--text3)">—</span>');html+='<tr onclick="openModal(\''+esc(c.name)+'\')"><td style="font-weight:600;color:var(--text)">'+c.name+'</td><td style="color:var(--text2)">'+c.company+'</td><td>'+ci+'</td><td><span class="event-badge" style="font-size:9px">'+(c.event||'—')+'</span></td><td>'+sizeBadge(c.size)+'</td><td><span class="score-pill" style="background:'+scoreColor(c.score)+'">'+c.score+'</span></td><td>'+prioBadge(c.priority)+'</td><td>'+stageBadge(st)+'</td><td>'+assigneeLabel(c.assignedTo)+'</td><td style="color:var(--text3);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(c.notes||'').substring(0,55)+((c.notes||'').length>55?'…':'')+'</td></tr>';});}document.getElementById('contacts-tbody').innerHTML=html;}
 document.addEventListener('click',function(e){var btn=e.target.closest('.fb');if(!btn)return;var f=btn.dataset.f,v=btn.dataset.v;if(!f||!v)return;currentFilters[f]=v;document.querySelectorAll("[data-f='"+f+"']").forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});applyFilters();});
 document.getElementById('lead-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('form-modal').addEventListener('click',function(e){if(e.target===this)closeFormModal();});
@@ -1342,7 +1367,7 @@ function refresh(){updateKPIs();renderFocus();renderFollowUp();renderPipeline();
 
 window.addEventListener('DOMContentLoaded', async function() {
   var r = await sb.auth.getSession();
-  if (r.data && r.data.session) { showApp(); loadFromStorage(); loadUserProfile(); }
+  if (r.data && r.data.session) { showApp(); loadFromStorage(); loadUserProfile(); loadTeamUsers(); }
   tryInitGmail();
 });
 
@@ -1666,6 +1691,85 @@ async function sendViaGmail() {
 document.getElementById('gm-compose-modal').addEventListener('click', function(e) {
   if (e.target === this) closeGmailCompose();
 });
+
+// ── ASSIGNED-TO ───────────────────────────────────────────────
+var teamUsers = [];
+var currentAssigneeFilter = 'All';
+
+async function loadTeamUsers() {
+  var token = await getAuthToken();
+  if (!token) return;
+  try {
+    var r = await fetch('/api/users/team', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!r.ok) return;
+    teamUsers = await r.json();
+    renderAssigneeBar();
+    populateAssigneeSelects();
+  } catch(e) { console.error('Failed to load team users:', e); }
+}
+
+function userDisplayName(u) {
+  return u.full_name && u.full_name.trim() ? u.full_name.trim() : u.email.split('@')[0];
+}
+
+function userInitials(u) {
+  var name = u.full_name && u.full_name.trim() ? u.full_name.trim() : u.email;
+  return name.split(/\s|@/)[0].slice(0, 2).toUpperCase();
+}
+
+function assigneeLabel(assignedToId) {
+  if (!assignedToId) return '<span style="color:var(--text3);font-size:11px">—</span>';
+  var u = teamUsers.find(function(x) { return x.id === assignedToId; });
+  if (!u) return '<span style="color:var(--text3);font-size:11px">—</span>';
+  return '<span style="font-size:11px;color:var(--teal);font-weight:600">' + userDisplayName(u) + '</span>';
+}
+
+function renderAssigneeBar() {
+  var bar = document.getElementById('assignee-bar');
+  if (!bar) return;
+  if (!teamUsers.length) { bar.style.display = 'none'; return; }
+  bar.style.display = '';
+  var html = '<button class="assignee-tab' + (currentAssigneeFilter === 'All' ? ' active' : '') + '" onclick="switchAssignee(\'All\')">👥 All</button>';
+  html += '<button class="assignee-tab' + (currentAssigneeFilter === 'none' ? ' active' : '') + '" onclick="switchAssignee(\'none\')">— Unassigned</button>';
+  teamUsers.forEach(function(u) {
+    var initials = userInitials(u);
+    var name = userDisplayName(u);
+    html += '<button class="assignee-tab' + (currentAssigneeFilter === u.id ? ' active' : '') + '" onclick="switchAssignee(\'' + u.id + '\')">'
+      + '<span class="assignee-avatar">' + initials + '</span>' + name + '</button>';
+  });
+  bar.innerHTML = html;
+}
+
+function switchAssignee(val) {
+  currentAssigneeFilter = val;
+  renderAssigneeBar();
+  applyFilters();
+  refresh();
+}
+
+function populateAssigneeSelects() {
+  var opts = '<option value="">— Unassigned —</option>'
+    + teamUsers.map(function(u) {
+        return '<option value="' + u.id + '">' + userDisplayName(u) + '</option>';
+      }).join('');
+  var selects = ['f-assigned', 'm-assigned-select'];
+  selects.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = opts;
+  });
+}
+
+async function saveAssignedTo() {
+  if (!currentModalContact) return;
+  var assignedTo = document.getElementById('m-assigned-select').value || null;
+  var r = await sb.from('leads').update({ assigned_to: assignedTo }).eq('id', currentModalContact.id);
+  if (!r.error) {
+    currentModalContact.assignedTo = assignedTo;
+    var c = contacts.find(function(x) { return x.id === currentModalContact.id; });
+    if (c) c.assignedTo = assignedTo;
+    applyFilters();
+  }
+}
 
 // ── USER PROFILE & SETTINGS ───────────────────────────────────
 var currentUserProfile = null;

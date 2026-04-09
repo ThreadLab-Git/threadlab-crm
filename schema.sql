@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS leads (
                                CHECK (stage IN ('New','Reached Out','Pending Reply','Proposal Sent','In Discussion','Won','Dropped')),
   pending_since    TIMESTAMPTZ,          -- Set when stage first becomes "Pending Reply"
 
+  -- Assignment
+  assigned_to      UUID,                             -- FK to auth.users(id), soft reference
+
   -- Personal notes (Daniel's private follow-up notes)
   personal_note    TEXT        DEFAULT '',
 
@@ -72,6 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_leads_event_name   ON leads(event_name);
 CREATE INDEX IF NOT EXISTS idx_leads_stage        ON leads(stage);
 CREATE INDEX IF NOT EXISTS idx_leads_priority     ON leads(priority);
 CREATE INDEX IF NOT EXISTS idx_leads_score        ON leads(score DESC);
+CREATE INDEX IF NOT EXISTS idx_leads_assigned_to  ON leads(assigned_to);
 CREATE INDEX IF NOT EXISTS idx_activity_lead_id   ON activity_logs(lead_id);
 
 -- ── Auto-update updated_at ────────────────────────────────────────────────────
